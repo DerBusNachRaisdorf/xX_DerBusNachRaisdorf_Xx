@@ -1,0 +1,18 @@
+#!/bin/bash
+
+for (( ; ; ))
+do
+    git reset --hard @{u}
+    git fetch
+    git pull
+
+    # create git info
+    echo "**current commit**: '"$(git log -1 --pretty=%B)"'" >| ./src/info.md
+
+    cd src
+    mkdir -p /home/shared/logs/
+    python3.10 ./bot.py 'hier ihr token' &> /home/shared/logs/$(date -d "today" +"%Y%m%d%H%M").log
+    cd ..
+
+    sleep 1
+done
