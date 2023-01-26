@@ -2,7 +2,7 @@ import asyncio
 import os
 import random
 import json
-from sys import stderr
+from sys import stderr, argv
 import subprocess
 import random
 
@@ -426,10 +426,10 @@ if __name__ == '__main__':
         print('nein:')
         print(e)
 
-    if len(sys.argv) != 2:
+    if len(argv) != 2:
         exit(1)
 
-    token: str = sys.argv[1]
+    token: str = argv[1]
 
     intents = discord.Intents.all()
     #activity = discord.Activity(type=discord.ActivityType.listening, name="DP Projekt Teil 2 --- 9€")
