@@ -11,7 +11,7 @@ do
 
     cd src
     mkdir -p /home/shared/logs/
-    python3.10 ./bot.py 'hier ihr token' &> /home/shared/logs/$(date -d "today" +"%Y%m%d%H%M").log
+    python3.10 ./bot.py 'OTg1MjIwODE1ODk5NDkyNDEy.G-NMPG.ffW2D640zPU_cpVT4-rxRyc36a_yE25DjYA9oE' &> /home/shared/logs/$(date -d "today" +"%Y%m%d%H%M").log
     cd ..
 
     sleep 1
