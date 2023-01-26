@@ -44,5 +44,5 @@ def make_offensive_image(text: str):
 
 
 def __to_legal_filename(text: str) -> str:
-    result = [c if c.isalnum else '' for c in text]
+    result = [c if c.isalnum() else '' for c in text]
     return ''.join(result)
