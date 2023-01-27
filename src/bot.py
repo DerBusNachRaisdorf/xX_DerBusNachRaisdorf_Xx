@@ -180,7 +180,7 @@ class DerBusNachRaisdorfClient(discord.Client):
         )
 
     async def on_message(self, message: discord.Message):
-        muha_safe_message = legalize_str(message.content)
+        muha_safe_message = make_muha_safe(message.content)
         if muha_safe_message != message.content:
             muha_safe_message = f'!offend {user_get_name(message.author)}'
 
