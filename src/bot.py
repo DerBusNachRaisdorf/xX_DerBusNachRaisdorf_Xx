@@ -339,8 +339,8 @@ class DerBusNachRaisdorfClient(discord.Client):
             text: str = message.content[len(CMD_OFFEND)+1:len(message.content)]
             img_text: str = text if len(message.mentions) == 0 else ' '.join([(await self.fetch_user(user.id)).display_name for user in message.mentions])
             # check for any content
-            if img_text.strip(" ") is None:
-                text = img_text = REVILUM
+            if img_text.strip(" ") is None or '\\' in img_text:
+                text = img_text = user_get_name(message.author)
             # debug print
             print(f"Text begins here ->{img_text}<-")
             # check for invalid name content
