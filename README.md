@@ -1,6 +1,6 @@
 # xX_DerBusNachRaisdorf_Xx
 
-Dieser Discord-Bot hat hauptsächlich das Ziel, andere Discord-User zu nerven. Er ist Open-Source und kann auf [diesem GitHub Repository](https://github.com/DerBusNachRaisdorf/xX_DerBusNachRaisdorf_Xx/blob/main/README.md) gefunden werden.
+Dieser Discord-Bot hat hauptsächlich das Ziel, andere Discord-User zu nerven. Er ist Open-Source und kann auf [diesem GitHub Repository](https://github.com/DerBusNachRaisdorf/xX_DerBusNachRaisdorf_Xx) gefunden werden.
 
 ## Neuigkeiten
 - Der `!offend` - command ist jetzt Muha-Safe.
