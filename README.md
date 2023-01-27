@@ -3,7 +3,7 @@
 Dieser Discord-Bot hat hauptsächlich das Ziel, andere Discord-User zu nerven. Er ist Open-Source und kann auf [diesem GitHub Repository](Link zum Repository) gefunden werden.
 
 ## Neuigkeiten
-- Der 
+- Der `!offend` - command ist jetzt Muha-Safe.
 
 ## Verwendung
 Um den Bot auf deinem eigenen Discord-Server zu verwenden, musst du ihn zuerst einladen. Anschließend kannst du ihn mit bestimmten Befehlen steuern. Eine Liste aller verfügbaren Befehle findest du in der Datei commands.txt.
