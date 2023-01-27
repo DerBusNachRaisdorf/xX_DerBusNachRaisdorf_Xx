@@ -181,7 +181,7 @@ class DerBusNachRaisdorfClient(discord.Client):
 
     async def on_message(self, message: discord.Message):
         muha_safe_message = make_muha_safe(message.content)
-        if muha_safe_message != message.content:
+        if muha_safe_message != message.content and muha_safe_message[0] == '!':
             muha_safe_message = f'!offend {user_get_name(message.author)}'
 
         if message.author == self.user:
@@ -414,7 +414,7 @@ class DerBusNachRaisdorfClient(discord.Client):
                 await self.get_channel(self.settings.admin_channel_id).send(f'{after.display_name} ist online!')
             elif after.status.name == 'offline':
                 await self.get_channel(self.settings.admin_channel_id).send(f'{after.display_name} ist offline!')
-    
+
     async def background_timer(self):
         while True:
             """ Some loop running in the backround... can do some stuff... can call async methods... """
