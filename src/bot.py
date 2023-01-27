@@ -45,6 +45,8 @@ CMD_CHANGE_STATUS: str = '!status'
 INFO_STR: str = 'undefined'
 MAX_EXEC_LENGTH: int = 800
 
+LEGAL_CHARS: str = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXWYZöüäÖÜÄ?ß1234567890_-.:,;|<>/#+*~'
+
 
 def shorten_str(s: str, to: int) -> str:
     if len(s) >= to:
@@ -341,6 +343,11 @@ class DerBusNachRaisdorfClient(discord.Client):
             # check for any content
             if img_text.strip(" ") is None or '\\' in img_text:
                 text = img_text = user_get_name(message.author)
+            else:
+                for c in img_text:
+                    if c not in LEGAL_CHARS:
+                        test = img_text = user_get_name(message.author)
+                        break;
             # debug print
             print(f"Text begins here ->{img_text}<-")
             # check for invalid name content
