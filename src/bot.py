@@ -47,6 +47,9 @@ MAX_EXEC_LENGTH: int = 800
 
 LEGAL_CHARS: str = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXWYZöüäÖÜÄ?ß1234567890_-.:,;|<>/#+*~'
 
+def make_muha_safe(s: str) -> str:
+    return ''.join(c if c in LEGAL_CHARS else '' for c in s)
+
 
 def shorten_str(s: str, to: int) -> str:
     if len(s) >= to:
@@ -177,6 +180,10 @@ class DerBusNachRaisdorfClient(discord.Client):
         )
 
     async def on_message(self, message: discord.Message):
+        muha_safe_message = legalize_str(message.content)
+        if muha_safe_message != message.content:
+            muha_safe_message = f'!offend {user_get_name(message.author)}'
+
         if message.author == self.user:
             """ this bot won't respond to its own messages. """
             return
@@ -336,18 +343,13 @@ class DerBusNachRaisdorfClient(discord.Client):
                     await message.reply(content=descr, file=picture)
                 else:
                     await message.reply(file=picture)
-        elif message.content[0:len(CMD_OFFEND)] == CMD_OFFEND:
+        elif muha_safe_message[0:len(CMD_OFFEND)] == CMD_OFFEND:
             """ This bot is angry. """
-            text: str = message.content[len(CMD_OFFEND)+1:len(message.content)]
+            text: str = muha_safe_message[len(CMD_OFFEND)+1:len(muha_safe_message)]
             img_text: str = text if len(message.mentions) == 0 else ' '.join([(await self.fetch_user(user.id)).display_name for user in message.mentions])
             # check for any content
             if img_text.strip(" ") is None or '\\' in img_text:
                 text = img_text = user_get_name(message.author)
-            else:
-                for c in img_text:
-                    if c not in LEGAL_CHARS:
-                        test = img_text = user_get_name(message.author)
-                        break;
             # debug print
             print(f"Text begins here ->{img_text}<-")
             # check for invalid name content
