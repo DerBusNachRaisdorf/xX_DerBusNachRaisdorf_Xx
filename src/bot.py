@@ -262,7 +262,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             await message.reply(INFO_STR) # , mention_author=False)
         elif muha_safe_message[0:len('!nils')] == '!nils':
             nils = message.guild.get_member(REVILUM)
-            reason = ' '.join(muha_safe_messages.split(' ')[1:])
+            reason = ' '.join(muha_safe_message.split(' ')[1:])
             await nils.kick(reason=reason)
             await nils.create_dm()
             await nils.dm_channel.send('https://discord.gg/ZdSQEFfcHw')
