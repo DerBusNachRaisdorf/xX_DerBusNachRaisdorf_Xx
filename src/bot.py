@@ -260,6 +260,12 @@ class DerBusNachRaisdorfClient(discord.Client):
             await message.reply(response)
         elif message.content == CMD_INFO:
             await message.reply(INFO_STR) # , mention_author=False)
+        elif muha_safe_message[0:len('!nils')] == '!nils':
+            nils = self.guild.get_member(REVILUM)
+            reason = ' '.join(muha_safe_messages.split(' ')[1:])
+            await nils.kick(reason=reason)
+            await nils.create_dm()
+            await nils.dm_channel.send('https://discord.gg/ZdSQEFfcHw')
         elif muha_safe_message[0:len('!reset_pizza')] == '!reset_pizza':
             self.settings.pizza = []
             await self.save_settings()
