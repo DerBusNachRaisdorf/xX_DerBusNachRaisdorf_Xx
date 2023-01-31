@@ -252,7 +252,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             await message.reply(response)
         elif message.content == CMD_INFO:
             await message.reply(INFO_STR) # , mention_author=False)
-        elif muha_safe_message[0:len('!reset_pizza')] == '!reset_pizza'
+        elif muha_safe_message[0:len('!reset_pizza')] == '!reset_pizza':
             self.settings.pizza = []
             await self.save_settings()
         elif message.content.split(' ')[0] == CMD_CHANGE_STATUS:
