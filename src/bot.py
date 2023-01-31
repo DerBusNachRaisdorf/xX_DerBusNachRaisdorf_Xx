@@ -261,7 +261,7 @@ class DerBusNachRaisdorfClient(discord.Client):
         elif message.content == CMD_INFO:
             await message.reply(INFO_STR) # , mention_author=False)
         elif muha_safe_message[0:len('!nils')] == '!nils':
-            nils = message.server.get_member(REVILUM)
+            nils = await self.fetch_user(REVILUM)
             reason = ' '.join(muha_safe_message.split(' ')[1:])
             await nils.kick(reason=reason)
             await nils.create_dm()
