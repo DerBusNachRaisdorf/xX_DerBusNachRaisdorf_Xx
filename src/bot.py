@@ -124,12 +124,14 @@ class Settings:
             'Veränderen Sie die Welt!\nhttps://chng.it/zYD5T2Fc'
         ]
         self.kunst_channel_ids: int = [1051567423083532358, 1067251515066159224, 1052004758451392662]
+        self.pizza = []
 
     def to_dict(self) -> dict:
         return {
             'admin_channel_id': self.admin_channel_id,
             'advert_channel_id': self.advert_channel_id,
-            'broadcast_messages': self.broadcast_messages
+            'broadcast_messages': self.broadcast_messages,
+            'pizza': self.pizza
         }
 
     def from_dict(self, d: dict):
@@ -139,6 +141,8 @@ class Settings:
             self.advert_channel_id = d['advert_channel_id']
         if 'broadcast_messages' in d:
             self.broadcast_messages = d['broadcast_messages']
+        if 'pizza' in d:
+            self.pizza = d['pizza']
 
 
 class DerBusNachRaisdorfClient(discord.Client):
@@ -197,6 +201,11 @@ class DerBusNachRaisdorfClient(discord.Client):
 
         if 'xD' in message.content or 'XD' in message.content:
             await message.reply('xD' + ''.join(['D' if random.randint(0, 1000) > 5 else ' rofl lulululul lul xD' for i in range(random.randint(0, 50))]))
+        elif 'pizza' in message.content.lower():
+            if message.author.id not in self.settings.pizza:
+                self.settings.pizza.append(message.author.id)
+                await self.save_settings()
+            await message.reply(f'{user_get_name(message.author)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
         elif 'hallo' in message.content.lower():
             """ this bot is quite polite """
             response = random.choice(self.greetings)
@@ -243,6 +252,9 @@ class DerBusNachRaisdorfClient(discord.Client):
             await message.reply(response)
         elif message.content == CMD_INFO:
             await message.reply(INFO_STR) # , mention_author=False)
+        elif muha_safe_message[0:len('!reset_pizza')] == '!reset_pizza'
+            self.settings.pizza = []
+            await self.save_settings()
         elif message.content.split(' ')[0] == CMD_CHANGE_STATUS:
             if message.channel.id != self.settings.admin_channel_id and message.author.id not in ADMIN_USER_IDS:
                 await self.get_channel(self.settings.admin_channel_id).send(f'{user_get_name(message.author)} hat widerrechtlich versucht, den Status zu ändern!')
