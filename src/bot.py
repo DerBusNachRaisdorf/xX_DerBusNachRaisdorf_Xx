@@ -250,6 +250,9 @@ class DerBusNachRaisdorfClient(discord.Client):
             ]
             for paragraph in random.choice(responses):
                 await message.reply(paragraph)
+        else:
+            if random.randint(0,100) > 90:
+                await message.reply('blah blah');
 
         if message.content == 'Bitte helfen Sie mir, ich bin in Gefahr!':
             """ this bot won't help u. """
