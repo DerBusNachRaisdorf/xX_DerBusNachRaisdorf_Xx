@@ -207,7 +207,7 @@ class DerBusNachRaisdorfClient(discord.Client):
                 await self.save_settings()
             if len(self.settings.pizza) == 0:
                 await message.reply(f'{user_get_name(message.author)} will Pizza essen.')
-            else if len(self.settings.pizza) == 1:
+            elif len(self.settings.pizza) == 1:
                 await message.reply(f'{user_get_name(message.author)} und noch jemand will Pizza essen.')
             else:
                 await message.reply(f'{user_get_name(message.author)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
