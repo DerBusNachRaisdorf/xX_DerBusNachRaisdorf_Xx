@@ -45,7 +45,7 @@ CMD_CHANGE_STATUS: str = '!status'
 INFO_STR: str = 'undefined'
 MAX_EXEC_LENGTH: int = 800
 
-LEGAL_CHARS: str = ' !abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXWYZöüäÖÜÄ?ß1234567890_-.:,;|<>/#+*~'
+LEGAL_CHARS: str = ' !abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXWYZöüäÖÜÄ?ß1234567890_-.:,;|<>/#+*~@'
 
 def make_muha_safe(s: str) -> str:
     return ''.join(c if c in LEGAL_CHARS else '' for c in s)
