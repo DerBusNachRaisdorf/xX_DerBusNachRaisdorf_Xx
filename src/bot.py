@@ -192,7 +192,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             """ this bot can respond to dms! """
             if message.content == '!subscribe':
                 pass
-            return
+            #return
 
         if 'xD' in message.content or 'XD' in message.content:
             await message.reply('xD' + ''.join(['D' if random.randint(0, 1000) > 5 else ' rofl lulululul lul xD' for i in range(random.randint(0, 50))]))
@@ -345,11 +345,11 @@ class DerBusNachRaisdorfClient(discord.Client):
                     await message.reply(file=picture)
         elif muha_safe_message[0:len(CMD_OFFEND)] == CMD_OFFEND:
             """ This bot is angry. """
-            text: str = muha_safe_message[len(CMD_OFFEND)+1:len(muha_safe_message)]
+            text: str = muha_safe_message[len(CMD_OFFEND)+1:]
             img_text: str = text if len(message.mentions) == 0 else ' '.join([(await self.fetch_user(user.id)).display_name for user in message.mentions])
             # check for any content
-            if img_text.strip(" ") is None or '\\' in img_text:
-                text = img_text = user_get_name(message.author)
+            #if img_text.strip(" ") is None or '\\' in img_text:
+            #    text = img_text = user_get_name(message.author)
             # debug print
             print(f"Text begins here ->{img_text}<-")
             # check for invalid name content
