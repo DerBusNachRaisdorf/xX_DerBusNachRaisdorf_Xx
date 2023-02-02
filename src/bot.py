@@ -110,6 +110,13 @@ def user_get_name(discord_user) -> str:
         return discord_user.name
 
 
+def user_get_name_from_id(discord_user_id) -> str:
+    if discord_user.id in USER_ALIASES:
+        return USER_ALIASES[discord_user_id]
+    else:
+        return discord_user.name
+
+
 class Settings:
     def __init__(self):
         self.admin_channel_id: int = 985262849775525998
@@ -200,16 +207,16 @@ class DerBusNachRaisdorfClient(discord.Client):
                 pass
             #return
 
-        if 'nils pizza' in message.content.lower():
+        if '?nils pizza' in message.content.lower():
             if REVILUM_ID not in self.settings.pizza:
                 self.settings.pizza.append(REVILUM_ID)
                 await self.save_settings()
             if len(self.settings.pizza) == 1:
-                await message.reply(f'{user_get_name(REVILUM_ID)} will Pizza essen.')
+                await message.reply(f'{user_get_name_from_id(REVILUM_ID)} will Pizza essen.')
             elif len(self.settings.pizza) == 2:
-                await message.reply(f'{user_get_name(REVILUM_ID)} und noch jemand will Pizza essen.')
+                await message.reply(f'{user_get_name_from_id(REVILUM_ID)} und noch jemand will Pizza essen.')
             else:
-                await message.reply(f'{user_get_name(REVILUM_ID)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
+                await message.reply(f'{user_get_name_from_id(REVILUM_ID)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
         elif 'xD' in message.content or 'XD' in message.content:
             await message.reply('xD' + ''.join(['D' if random.randint(0, 1000) > 5 else ' rofl lulululul lul xD' for i in range(random.randint(0, 50))]))
         elif 'pizza' in message.content.lower() and muha_safe_message[0] != '!':
