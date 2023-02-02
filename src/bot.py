@@ -111,7 +111,7 @@ def user_get_name(discord_user) -> str:
 
 
 def user_get_name_from_id(discord_user_id) -> str:
-    if discord_user.id in USER_ALIASES:
+    if discord_user_id in USER_ALIASES:
         return USER_ALIASES[discord_user_id]
     else:
         return discord_user.name
