@@ -189,7 +189,7 @@ class DerBusNachRaisdorfClient(discord.Client):
         muha_safe_message = make_muha_safe(message.content)
         if muha_safe_message != message.content and muha_safe_message[0] == '!':
             message.content = muha_safe_message
-            muha_safe_message = f'!offend {user_get_name(message.author)}'
+            #muha_safe_message = f'!offend {user_get_name(message.author)}'
 
         if message.author == self.user:
             """ this bot won't respond to its own messages. """
