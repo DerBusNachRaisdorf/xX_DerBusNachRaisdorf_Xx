@@ -200,7 +200,7 @@ class DerBusNachRaisdorfClient(discord.Client):
                 pass
             #return
 
-        if '?nils pizza' in message.content.lower():
+        if '?nils_pizza' in message.content.lower():
             if REVILUM_ID not in self.settings.pizza:
                 self.settings.pizza.append(REVILUM_ID)
                 await self.save_settings()
