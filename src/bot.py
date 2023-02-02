@@ -201,7 +201,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             #return
 
         if '?nils pizza' in message.content.lower():
-            if message.author.id not in self.settings.pizza:
+            if REVILUM_ID not in self.settings.pizza:
                 self.settings.pizza.append(REVILUM_ID)
                 await self.save_settings()
             if len(self.settings.pizza) == 1:
