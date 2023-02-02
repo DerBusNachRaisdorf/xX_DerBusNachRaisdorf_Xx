@@ -200,7 +200,17 @@ class DerBusNachRaisdorfClient(discord.Client):
                 pass
             #return
 
-        if 'xD' in message.content or 'XD' in message.content:
+        if '?nils pizza' in message.content.lower():
+            if message.author.id not in self.settings.pizza:
+                self.settings.pizza.append(REVILUM_ID)
+                await self.save_settings()
+            if len(self.settings.pizza) == 1:
+                await message.reply(f'{user_get_name(REVILUM_ID)} will Pizza essen.')
+            elif len(self.settings.pizza) == 2:
+                await message.reply(f'{user_get_name(REVILUM_ID)} und noch jemand will Pizza essen.')
+            else:
+                await message.reply(f'{user_get_name(REVILUM_ID)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
+        elif 'xD' in message.content or 'XD' in message.content:
             await message.reply('xD' + ''.join(['D' if random.randint(0, 1000) > 5 else ' rofl lulululul lul xD' for i in range(random.randint(0, 50))]))
         elif 'pizza' in message.content.lower() and muha_safe_message[0] != '!':
             if message.author.id not in self.settings.pizza:
