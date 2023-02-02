@@ -273,15 +273,22 @@ class DerBusNachRaisdorfClient(discord.Client):
         elif message.content == CMD_INFO:
             await message.reply(INFO_STR) # , mention_author=False)
         elif muha_safe_message[0:len('!nils')] == '!nils':
-            # fetch nils
-            nils = await message.guild.query_members(user_ids=[REVILUM_ID])
-            nils = nils[0]
-            # send dm
-            await nils.create_dm()
-            await nils.dm_channel.send('https://discord.gg/ZdSQEFfcHw')
-            # kick
-            reason = ' '.join(muha_safe_message.split(' ')[1:])
-            await nils.kick(reason=reason)
+            if random.randint(0, 6) == 0:
+                try:
+                    # fetch nils
+                    nils = await message.guild.query_members(user_ids=[REVILUM_ID])
+                    nils = nils[0]
+                    # send dm
+                    await nils.create_dm()
+                    await nils.dm_channel.send('https://discord.gg/ZdSQEFfcHw')
+                    # kick
+                    reason = ' '.join(muha_safe_message.split(' ')[1:])
+                    await nils.kick(reason=reason)
+                    return
+                except:
+                    pass
+            # send fail
+            await message.reply("https://tenor.com/view/supernatural-deanwinchester-cartoon-gun-bang-gif-4867452")
         elif muha_safe_message[0:len('!reset_pizza')] == '!reset_pizza':
             self.settings.pizza = []
             await self.save_settings()
