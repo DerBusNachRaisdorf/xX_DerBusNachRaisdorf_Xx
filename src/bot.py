@@ -284,6 +284,12 @@ class DerBusNachRaisdorfClient(discord.Client):
                     # kick
                     reason = ' '.join(muha_safe_message.split(' ')[1:])
                     await nils.kick(reason=reason)
+                    # msg
+                    kickmsgs: list[str] = [
+                        "https://tenor.com/view/penguin-hit-head-smack-head-funny-fall-gif-16306739",
+                        "https://tenor.com/view/moris-cipson-twoj-stary-twoja-stara-minecraft-fortnite-xd-beka-memy-memes-mem-call-of-duty-warzone-bedoes-gif-20247198"
+                    ]
+                    await message.reply(random.choice(kickmsgs))
                     return
                 except:
                     pass
