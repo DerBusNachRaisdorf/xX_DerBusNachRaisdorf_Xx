@@ -4,7 +4,7 @@ import settings
 from context import Context
 
 
-def ban_id(context: Context, user_id: int):
+async def ban_id(context: Context, user_id: int):
     # get message
     message = context.message
     # special case
@@ -47,7 +47,7 @@ command_mapping: {str: callable(Context)} = {
     "merlin": lambda c: ban_id(c, settings.USER_IDS["Merlin"]),
 }
 
-commands = {command_mapping.keys()}
+commands = {*command_mapping.keys()}
 
 
 def call_if_command(context: Context) -> bool:

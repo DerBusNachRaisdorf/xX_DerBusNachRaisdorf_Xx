@@ -13,7 +13,7 @@ USER_ALIASES = {user_tuple[0]: user_tuple[1] for user_tuple in USER_DATA}
 
 
 # name to id
-USER_IDS = {user_tuple[1]: user_tuple[2] for user_tuple in USER_DATA}
+USER_IDS = {user_tuple[1]: user_tuple[0] for user_tuple in USER_DATA}
 # TODO MERLIN MACH DAS WEG!!!
 REVILUM_ID = USER_IDS["Nils"]
 
