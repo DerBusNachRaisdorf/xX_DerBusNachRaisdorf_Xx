@@ -56,6 +56,6 @@ async def call_if_command(context: Context) -> bool:
     if command not in commands:
         return False
     # execute method
-    command_mapping[command](context)
+    await command_mapping[command](context)
     # return successful execution
     return True
