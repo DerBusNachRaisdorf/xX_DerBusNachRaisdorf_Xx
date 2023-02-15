@@ -46,7 +46,7 @@ CMD_CHANGE_STATUS: str = '!status'
 INFO_STR: str = 'undefined'
 MAX_EXEC_LENGTH: int = 800
 
-LEGAL_CHARS: set = {*' !abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXWYZöüäÖÜÄ?ß1234567890_-.:,;|<>/#+*~@'}
+LEGAL_CHARS: set = {*' !abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXWYZöüäÖÜÄ?ß1234567890_-.:,;|<>/#+*~@é'}
 
 TOS: list[str] = [
     "***Terms of Service für xX_DerBusNachRaisdorf_Xx***",
@@ -309,8 +309,9 @@ class DerBusNachRaisdorfClient(discord.Client):
                     ]
                     await message.reply(random.choice(kickmsgs))
                     return
-                except:
-                    pass
+                except Exception as e:
+                    print(f'Can not ban Nils: {e}')
+                    await message.reply("Leider nicht!")
             # send fail
             await message.reply("https://tenor.com/view/supernatural-deanwinchester-cartoon-gun-bang-gif-4867452")
         elif muha_safe_message[0:len('!reset_pizza')] == '!reset_pizza':
