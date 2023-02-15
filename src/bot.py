@@ -192,6 +192,11 @@ class DerBusNachRaisdorfClient(discord.Client):
                 pass
             #return
 
+        # better command handling
+        if commands.call_if_command(context):
+            return
+
+        # old handling
         if '?nils pizza' in message.content.lower():
             if REVILUM_ID not in self.settings.pizza:
                 self.settings.pizza.append(REVILUM_ID)
@@ -266,8 +271,6 @@ class DerBusNachRaisdorfClient(discord.Client):
         elif message.content.split(' ')[0] == '!tos':
             for paragraph in TOS:
                 await message.reply(paragraph)
-        elif muha_safe_message[0:len('!nils')] == '!nils':
-            return commands.ban_id(context)
         elif muha_safe_message[0:len('!reset_pizza')] == '!reset_pizza':
             self.settings.pizza = []
             await self.save_settings()
