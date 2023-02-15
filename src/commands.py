@@ -52,7 +52,6 @@ commands = {*command_mapping.keys()}
 
 async def call_if_command(context: Context) -> bool:
     command = context.command
-    await context.message.reply(command)
     # check if handled
     if command not in commands:
         return False
