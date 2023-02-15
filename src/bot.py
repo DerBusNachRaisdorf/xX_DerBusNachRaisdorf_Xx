@@ -188,7 +188,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             # return
 
         # better command handling
-        if commands.call_if_command(context):
+        if await commands.call_if_command(context):
             return
 
         # old handling
