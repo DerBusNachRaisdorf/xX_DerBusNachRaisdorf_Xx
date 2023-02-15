@@ -423,12 +423,17 @@ class DerBusNachRaisdorfClient(discord.Client):
             if pot_xml_error:
                 img_text = text
             path = image_gen.make_offensive_image(img_text)
-            if path:
-                with open(path, 'rb') as f:
-                    picture = discord.File(f)
-                    # response_message: str = f'Uhhm. I know exactly what you are talking about and I\'m very happy to say that uhh it\'s the exception rather than the rule. And I\'m also happy to very publicly point out, that {text} has been one of the worst troublespots we`ve had with hardware manifactures. And that is really sad because {text} tries to sell chips - a lot of chips - into the android market. And {text} has been the single worst company we`ve ever dealt with. So, {text}, fuck you!'
-                    response_message: str = f'> Uhhm. I know exactly what you are talking about and I\'m very happy to say that it\'s the exception rather than the rule. And I\'m also happy to very publicly point out, that {text} has been one of the worst troublespots we\'ve had [...]. And that is really sad [...]. And {text} has been the single worst [...] we\'ve ever dealt with. So, {text}, fuck you!\n ~ *Linus Torvalds, more or less*'
-                    await message.channel.send(response_message, file=picture)
+            # check image gen
+            if not path:
+                return
+            with open(path, 'rb') as f:
+                picture = discord.File(f)
+                # response_message: str = f'Uhhm. I know exactly what you are talking about and I\'m very happy to say that uhh it\'s the exception rather than the rule. And I\'m also happy to very publicly point out, that {text} has been one of the worst troublespots we`ve had with hardware manifactures. And that is really sad because {text} tries to sell chips - a lot of chips - into the android market. And {text} has been the single worst company we`ve ever dealt with. So, {text}, fuck you!'
+                response_message: str = f'> Uhhm. I know exactly what you are talking about and I\'m very happy to say that it\'s the exception rather than the rule. And I\'m also happy to very publicly point out, that {text} has been one of the worst troublespots we\'ve had [...]. And that is really sad [...]. And {text} has been the single worst [...] we\'ve ever dealt with. So, {text}, fuck you!\n ~ *Linus Torvalds, more or less*'
+                await message.channel.send(response_message, file=picture)
+            # delete image
+            os.remove(path)
+
         elif message.content == '!help':
             await message.channel.send(f'`{CMD_ADD_ADVERT} <message>` - fügt eine Werbung hinzu.')
             await message.channel.send(f'`{CMD_REMOVE_ADVERT} <index>` - löscht die Werbung am entsprechenden Index.')
