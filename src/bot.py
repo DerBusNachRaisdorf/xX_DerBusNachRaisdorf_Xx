@@ -12,21 +12,15 @@ from discord.utils import get
 import image_gen
 import utility.markdown
 from utility.proc import run_proc
+from utility.parsing import tokenize_argv
+import commands
+from context import Context
+from settings import *
 
 SETTINGS_FILE: str = '/home/shared/botsettings.json'
 BACKGROUND_TIMER_INTERVAL_SEC: int = 10
 BROADCAST_TIMER_INTERVAL_SEC: int = 15 * 60
 TARGET_USER_ID: int = 373093304767873044
-REVILUM: str = "Revilum"
-REVILUM_ID: int = 224037892387766272
-ADMIN_USER_IDS: list[int] = [330701572118151169, 373093304767873044]
-USER_ALIASES: dict[int, str] = {
-    224037892387766272: 'Nils',
-    397130478907293707: 'Muha',
-    373093304767873044: 'Finn',
-    696336485846220803: 'Emely',
-    330701572118151169: 'Merlin'
-}
 
 
 """ commands """
@@ -50,17 +44,53 @@ LEGAL_CHARS: set = {*' !abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXWYZöü
 
 TOS: list[str] = [
     "***Terms of Service für xX_DerBusNachRaisdorf_Xx***",
-    "**1. Nutzung des Bots**  \n> a. Die Verwendung des Bots erfolgt auf eigene Gefahr. Wir übernehmen keine Haftung für Schäden, die durch die Nutzung des Bots entstehen.  \n> b. Der Bot darf nur für den privaten Gebrauch genutzt werden. Eine kommerzielle Nutzung ist untersagt.  \n> c. Wir behalten uns das Recht vor, die Funktionen des Bots jederzeit und ohne Ankündigung zu ändern oder zu entfernen.  ",
-    "**2. Verbotene Handlungen**  \n> a. Es ist nicht gestattet, unangebrachte oder geschichtlich negativ belegte Symbole zu verwenden.  \n> b. Das Suchen nach Schwachstellen in dem !offend Command und das Ausnutzen dieser Schwachstellen ist untersagt.  \n> c. *Nils ist explizit verboten, gegen diese Bestimmungen zu verstoßen.*",
-    "**3. Verantwortlichkeit der Nutzer**  \n> a. Jeder Nutzer ist selbst für die Inhalte verantwortlich, die er über den Bot verbreitet.  \n> b. Es ist verboten, Inhalte zu verbreiten, die gegen geltendes Recht verstoßen.  \n> c. Der Nutzer haftet für alle Schäden, die durch seine Handlungen entstehen.  ",
-    "**4. Haftungsausschluss**  \n> a. Wir übernehmen keine Haftung für die Inhalte, die über den Bot verbreitet werden.  \n> b. Wir übernehmen keine Haftung für Schäden, die durch die Nutzung des Bots entstehen.  \n> c. Wir übernehmen keine Haftung für Ausfälle oder Störungen des Bots.  ",
-    "**5. Änderungen der Terms of Service**  \n> a. Wir behalten uns das Recht vor, die Terms of Service jederzeit und ohne Ankündigung zu ändern.  \n> b. Die Änderungen werden über den Bot bekannt gegeben.  ",
-    "**6. Meme-Regelung**  \n> a. Memes sind ausdrücklich erlaubt, solange sie nicht gegen die Verbotenen Handlungen verstoßen.  \n> b. Memes dürfen keine urheberrechtlich geschützten Inhalte enthalten.  \n> c. Wir behalten uns das Recht vor, Memes zu entfernen, die gegen diese Bestimmungen verstoßen.  \n> d. Memes müssen lustig sein, um verbreitet zu werden.  ",
-    "**7. Weitere Bestimmungen**  \n> a. Jeder Nutzer muss mindestens einen Witz pro Woche in einem dafür vorgesehenen Channel posten.  \n> b. Der Gebrauch von \"xD\", \"lol\" oder \"rofl\" wird ausdrücklich ermutigt.\n> c. Bei Verstoß gegen diese Bestimmungen kann eine Strafe in Form eines virtuellen Kekses verhängt werden.  \n> d. Alle Nutzer müssen einmal pro Woche in einer Karaoke-Nacht ihr Lieblingslied performen.  ",
-    "**8. Kreativitätsfördernde Ergänzungen**  \n> a. Jeder Nutzer muss eine wöchentliche Umfrage zu einer wichtigen Frage stellen, z.B. \"Was ist besser: Katzen oder Hunde?\"  \n> b. Das Nutzen von Emojis, die nichts mit dem Inhalt der Nachricht zu tun haben, wird empfohlen.  \n> c. Es ist verboten, in einem Voice-Channel zu sprechen, ohne dabei eine lustige Mütze oder Kopfbedeckung zu tragen.  \n> d. Mindestens einmal pro Woche müssen alle Nutzer ein Selfie von sich in einem Discord-Channel posten.  \n> e. Wenn ein Nutzer einen Rechtschreibfehler macht, muss er einen Limerick schreiben, um ihn zu korrigieren.  \n> f. Der \"Satz des Tages\" muss jeden Tag um Punkt 12 Uhr Mittags von einem Nutzer gepostet werden.  \n> g. Es ist verboten, das Wort \"Hallo\" zu benutzen. Stattdessen muss jeder Nutzer eine andere Begrüßung verwenden.  ",
-    "**9. Spezielle Verhaltensregeln für *einen* bestimmten Nutzer zur Vermeidung unangemessener Nutzung des Bots**  \n> *Nils ist ausdrücklich untersagt, jegliche Art von geschichtlich negativ konnotierten Symbolen in seinen Nachrichten zu verwenden.*  \n> Dies schließt, aber ist nicht beschränkt auf, Hakenkreuze, Keltenkreuze oder andere Symbole ein, die in irgendeiner Form mit Rassismus, Antisemitismus, Fremdenfeindlichkeit oder anderen Formen von Hass und Diskriminierung in Verbindung gebracht werden können. Bei Verstoß gegen diese Bestimmung wird Nils sofort vom Bot ausgeschlossen.  ",
-    "**10. Unsicherheiten und Änderungen**  \n> Sollten Unsicherheiten bezüglich dieser Nutzungsbedingungen bestehen oder Änderungsvorschläge vorliegen, kann der Nutzer sich direkt an ChatGPT wenden. Für die Übernahme einer geänderten Version oder Interpretation der Nutzungsbedingungen ist jedoch die Zustimmung eines Administrators des Discord-Servers \"CAU-Elite\" erforderlich.",
-    "Mit der Nutzung des Bots akzeptieren Sie automatisch diese Terms of Service, einschließlich der kreativitätsfördernden Ergänzungen und der expliziten Bestimmung, dass Nils ebenfalls alle hier genannten Bestimmungen einhalten muss. Bei Verstoß gegen diese Bestimmungen behalten wir uns das Recht vor, den Zugang zum Bot zu sperren."
+    "**1. Nutzung des Bots**  \n"
+    "> a. Die Verwendung des Bots erfolgt auf eigene Gefahr."
+    "Wir übernehmen keine Haftung für Schäden, die durch die Nutzung des Bots entstehen.  \n"
+    "> b. Der Bot darf nur für den privaten Gebrauch genutzt werden. Eine kommerzielle Nutzung ist untersagt.\n"
+    "> c. Wir behalten uns das Recht vor, die Funktionen des Bots jederzeit und ohne Ankündigung zu ändern oder zu "
+    "entfernen.  ",
+    "**2. Verbotene Handlungen**  \n> a. Es ist nicht gestattet, unangebrachte oder geschichtlich negativ belegte "
+    "Symbole zu verwenden.  \n> b. Das Suchen nach Schwachstellen in dem !offend Command und das Ausnutzen dieser "
+    "Schwachstellen ist untersagt.  \n> c. *Nils ist explizit verboten, gegen diese Bestimmungen zu verstoßen.*",
+    "**3. Verantwortlichkeit der Nutzer**  \n> a. Jeder Nutzer ist selbst für die Inhalte verantwortlich, die er über "
+    "den Bot verbreitet.  \n> b. Es ist verboten, Inhalte zu verbreiten, die gegen geltendes Recht verstoßen.  \n> c. "
+    "Der Nutzer haftet für alle Schäden, die durch seine Handlungen entstehen.  ",
+    "**4. Haftungsausschluss**  \n> a. Wir übernehmen keine Haftung für die Inhalte, die über den Bot verbreitet "
+    "werden.  \n> b. Wir übernehmen keine Haftung für Schäden, die durch die Nutzung des Bots entstehen.  \n> c. Wir "
+    "übernehmen keine Haftung für Ausfälle oder Störungen des Bots.  ",
+    "**5. Änderungen der Terms of Service**  \n> a. Wir behalten uns das Recht vor, die Terms of Service jederzeit "
+    "und ohne Ankündigung zu ändern.  \n> b. Die Änderungen werden über den Bot bekannt gegeben.  ",
+    "**6. Meme-Regelung**  \n> a. Memes sind ausdrücklich erlaubt, solange sie nicht gegen die Verbotenen Handlungen "
+    "verstoßen.  \n> b. Memes dürfen keine urheberrechtlich geschützten Inhalte enthalten.  \n> c. Wir behalten uns "
+    "das Recht vor, Memes zu entfernen, die gegen diese Bestimmungen verstoßen.  \n> d. Memes müssen lustig sein, "
+    "um verbreitet zu werden.  ",
+    "**7. Weitere Bestimmungen**  \n> a. Jeder Nutzer muss mindestens einen Witz pro Woche in einem dafür "
+    "vorgesehenen Channel posten.  \n> b. Der Gebrauch von \"xD\", \"lol\" oder \"rofl\" wird ausdrücklich "
+    "ermutigt.\n> c. Bei Verstoß gegen diese Bestimmungen kann eine Strafe in Form eines virtuellen Kekses verhängt "
+    "werden.  \n> d. Alle Nutzer müssen einmal pro Woche in einer Karaoke-Nacht ihr Lieblingslied performen.  ",
+    "**8. Kreativitätsfördernde Ergänzungen**  \n> a. Jeder Nutzer muss eine wöchentliche Umfrage zu einer wichtigen "
+    "Frage stellen, z.B. \"Was ist besser: Katzen oder Hunde?\"  \n> b. Das Nutzen von Emojis, die nichts mit dem "
+    "Inhalt der Nachricht zu tun haben, wird empfohlen.  \n> c. Es ist verboten, in einem Voice-Channel zu sprechen, "
+    "ohne dabei eine lustige Mütze oder Kopfbedeckung zu tragen.  \n> d. Mindestens einmal pro Woche müssen alle "
+    "Nutzer ein Selfie von sich in einem Discord-Channel posten.  \n> e. Wenn ein Nutzer einen Rechtschreibfehler "
+    "macht, muss er einen Limerick schreiben, um ihn zu korrigieren.  \n> f. Der \"Satz des Tages\" muss jeden Tag um "
+    "Punkt 12 Uhr Mittags von einem Nutzer gepostet werden.  \n> g. Es ist verboten, das Wort \"Hallo\" zu benutzen. "
+    "Stattdessen muss jeder Nutzer eine andere Begrüßung verwenden.  ",
+    "**9. Spezielle Verhaltensregeln für *einen* bestimmten Nutzer zur Vermeidung unangemessener Nutzung des Bots**  "
+    "\n> *Nils ist ausdrücklich untersagt, jegliche Art von geschichtlich negativ konnotierten Symbolen in seinen "
+    "Nachrichten zu verwenden.*  \n> Dies schließt, aber ist nicht beschränkt auf, Hakenkreuze, Keltenkreuze oder "
+    "andere Symbole ein, die in irgendeiner Form mit Rassismus, Antisemitismus, Fremdenfeindlichkeit oder anderen "
+    "Formen von Hass und Diskriminierung in Verbindung gebracht werden können. Bei Verstoß gegen diese Bestimmung "
+    "wird Nils sofort vom Bot ausgeschlossen.  ",
+    "**10. Unsicherheiten und Änderungen**  \n> Sollten Unsicherheiten bezüglich dieser Nutzungsbedingungen bestehen "
+    "oder Änderungsvorschläge vorliegen, kann der Nutzer sich direkt an ChatGPT wenden. Für die Übernahme einer "
+    "geänderten Version oder Interpretation der Nutzungsbedingungen ist jedoch die Zustimmung eines Administrators "
+    "des Discord-Servers \"CAU-Elite\" erforderlich.",
+    "Mit der Nutzung des Bots akzeptieren Sie automatisch diese Terms of Service, einschließlich der "
+    "kreativitätsfördernden Ergänzungen und der expliziten Bestimmung, dass Nils ebenfalls alle hier genannten "
+    "Bestimmungen einhalten muss. Bei Verstoß gegen diese Bestimmungen behalten wir uns das Recht vor, den Zugang zum "
+    "Bot zu sperren. "
 ]
 
 
@@ -83,31 +113,6 @@ def shorten_str_lines(s: str, to: int) -> str:
         return ''.join(lines[0:to])
 
 
-def is_whitespace(c) -> bool:
-    return c == ' ' or c == '\t'
-
-
-def tokenize_argv(cmd: str) -> list[str]:
-    argv: list[str] = []
-    cur_token: str = ''
-    is_str: bool = False
-    is_esc: bool = False
-    for c in cmd:
-        if c == '"' and not is_esc:
-            is_str = not is_str
-        elif c == '\\' and not is_esc:
-            is_esc = True
-        elif is_whitespace(c) and not is_str and not is_esc and cur_token != '':
-            argv.append(cur_token)
-            cur_token = ''
-        else:
-            cur_token += c
-            is_esc = False
-    if cur_token != '':
-        argv.append(cur_token)
-    return argv
-
-
 def make_str_literal(s: str) -> str:
     res: str = ''
     for c in s:
@@ -121,44 +126,9 @@ def make_str_literal(s: str) -> str:
 def user_get_name(discord_user) -> str:
     return USER_ALIASES.get(discord_user.id, discord_user.name)
 
+
 def user_get_name_from_id(discord_user_id) -> str:
     return USER_ALIASES.get(discord_user_id, 'deine mudda')
-
-
-class Settings:
-    def __init__(self):
-        self.admin_channel_id: int = 985262849775525998
-        self.advert_channel_id: int = 985262936291430470
-        self.broadcast_messages: list[str] = [
-            'Es gibt eine Menge gute IDEs!\nDiese sind super leicht zu installieren und zu nutzen!\nHier ist eine: \nhttps://code.visualstudio.com/',
-            'Es gibt eine Menge gute IDEs!\nDiese sind super leicht zu installieren und zu nutzen!\nHier ist eine: \nhttps://www.jetbrains.com/de-de/idea/',
-            'Es gibt eine Menge gute IDEs!\nDiese sind super leicht zu installieren und zu nutzen!\nHier ist eine: \nhttps://www.eclipse.org/downloads/',
-            'Erstellen Sie sich jetzt einen GitHub account!\nhttps://github.com/signup',
-            'Git ist super! Installieren Sie Git jetzt!\nhttps://git-scm.com/',
-            'Es gibt viele IDEs, die speziell für Java geeignet sind. Einen Überblick finden Sie hier:\n https://www.programmierenlernenhq.de/java-programmieren-lernen-die-besten-java-entwicklungsumgebungen/',
-            'Der Windows Editor war gestern!\nInstallieren Sie jetzt eine komfortable IDE Ihrer Wahl!',
-            'Veränderen Sie die Welt!\nhttps://chng.it/zYD5T2Fc'
-        ]
-        self.kunst_channel_ids: int = [1051567423083532358, 1067251515066159224, 1052004758451392662]
-        self.pizza = []
-
-    def to_dict(self) -> dict:
-        return {
-            'admin_channel_id': self.admin_channel_id,
-            'advert_channel_id': self.advert_channel_id,
-            'broadcast_messages': self.broadcast_messages,
-            'pizza': self.pizza
-        }
-
-    def from_dict(self, d: dict):
-        if 'admin_channel_id' in d:
-            self.admin_channel_id = d['admin_channel_id']
-        if 'advert_channel_id' in d:
-            self.advert_channel_id = d['advert_channel_id']
-        if 'broadcast_messages' in d:
-            self.broadcast_messages = d['broadcast_messages']
-        if 'pizza' in d:
-            self.pizza = d['pizza']
 
 
 class DerBusNachRaisdorfClient(discord.Client):
@@ -201,7 +171,13 @@ class DerBusNachRaisdorfClient(discord.Client):
         )
 
     async def on_message(self, message: discord.Message):
+        # ja lies halt
         muha_safe_message = make_muha_safe(message.content)
+        # create context
+        context = Context(message=message,
+                          client=self,
+                          settings=self.settings)
+
         if muha_safe_message != message.content and muha_safe_message[0] == '!':
             message.content = muha_safe_message
             #muha_safe_message = f'!offend {user_get_name(message.author)}'
@@ -278,8 +254,8 @@ class DerBusNachRaisdorfClient(discord.Client):
             for paragraph in random.choice(responses):
                 await message.reply(paragraph)
         else:
-            if random.randint(0,100) > 90:
-                await message.reply('blah blah');
+            if random.randint(0, 100) > 90:
+                await message.reply('blah blah')
 
         if message.content == 'Bitte helfen Sie mir, ich bin in Gefahr!':
             """ this bot won't help u. """
@@ -291,29 +267,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             for paragraph in TOS:
                 await message.reply(paragraph)
         elif muha_safe_message[0:len('!nils')] == '!nils':
-            if random.randint(0, 6) == 0:
-                try:
-                    # fetch nils
-                    nils = await message.guild.query_members(user_ids=[REVILUM_ID])
-                    nils = nils[0]
-                    # send dm
-                    await nils.create_dm()
-                    await nils.dm_channel.send('https://discord.gg/ZdSQEFfcHw')
-                    # kick
-                    reason = ' '.join(muha_safe_message.split(' ')[1:])
-                    await nils.kick(reason=reason)
-                    # msg
-                    kickmsgs: list[str] = [
-                        "https://tenor.com/view/penguin-hit-head-smack-head-funny-fall-gif-16306739",
-                        "https://tenor.com/view/moris-cipson-twoj-stary-twoja-stara-minecraft-fortnite-xd-beka-memy-memes-mem-call-of-duty-warzone-bedoes-gif-20247198"
-                    ]
-                    await message.reply(random.choice(kickmsgs))
-                    return
-                except Exception as e:
-                    print(f'Can not ban Nils: {e}')
-                    await message.reply("Leider nicht!")
-            # send fail
-            await message.reply("https://tenor.com/view/supernatural-deanwinchester-cartoon-gun-bang-gif-4867452")
+            return commands.ban_id(context)
         elif muha_safe_message[0:len('!reset_pizza')] == '!reset_pizza':
             self.settings.pizza = []
             await self.save_settings()
