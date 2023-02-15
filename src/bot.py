@@ -1,27 +1,23 @@
 import asyncio
+import json
 import os
 import random
-import json
 from sys import stderr, argv
-import subprocess
-import random
 
 import discord
-from discord.utils import get
 
+import commands
 import image_gen
 import utility.markdown
-from utility.proc import run_proc
-from utility.parsing import tokenize_argv
-import commands
 from context import Context
 from settings import *
+from utility.parsing import tokenize_argv
+from utility.proc import run_proc
 
 SETTINGS_FILE: str = '/home/shared/botsettings.json'
 BACKGROUND_TIMER_INTERVAL_SEC: int = 10
 BROADCAST_TIMER_INTERVAL_SEC: int = 15 * 60
 TARGET_USER_ID: int = 373093304767873044
-
 
 """ commands """
 CMD_ADD_ADVERT: str = '!add_advert'
@@ -132,7 +128,6 @@ def user_get_name_from_id(discord_user_id) -> str:
 
 
 class DerBusNachRaisdorfClient(discord.Client):
-
     greetings: list[str] = [
         'Moin!',
         'Hallo',
@@ -180,7 +175,7 @@ class DerBusNachRaisdorfClient(discord.Client):
 
         if muha_safe_message != message.content and muha_safe_message[0] == '!':
             message.content = muha_safe_message
-            #muha_safe_message = f'!offend {user_get_name(message.author)}'
+            # muha_safe_message = f'!offend {user_get_name(message.author)}'
 
         if message.author == self.user:
             """ this bot won't respond to its own messages. """
@@ -190,7 +185,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             """ this bot can respond to dms! """
             if message.content == '!subscribe':
                 pass
-            #return
+            # return
 
         # better command handling
         if commands.call_if_command(context):
@@ -206,9 +201,12 @@ class DerBusNachRaisdorfClient(discord.Client):
             elif len(self.settings.pizza) == 2:
                 await message.reply(f'{user_get_name_from_id(REVILUM_ID)} und noch jemand will Pizza essen.')
             else:
-                await message.reply(f'{user_get_name_from_id(REVILUM_ID)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
+                await message.reply(
+                    f'{user_get_name_from_id(REVILUM_ID)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
         elif 'xD' in message.content or 'XD' in message.content:
-            await message.reply('xD' + ''.join(['D' if random.randint(0, 1000) > 5 else ' rofl lulululul lul xD' for i in range(random.randint(0, 50))]))
+            await message.reply('xD' + ''.join(
+                ['D' if random.randint(0, 1000) > 5 else ' rofl lulululul lul xD' for i in
+                 range(random.randint(0, 50))]))
         elif 'pizza' in message.content.lower() and muha_safe_message[0] != '!':
             if message.author.id not in self.settings.pizza:
                 self.settings.pizza.append(message.author.id)
@@ -218,7 +216,8 @@ class DerBusNachRaisdorfClient(discord.Client):
             elif len(self.settings.pizza) == 2:
                 await message.reply(f'{user_get_name(message.author)} und noch jemand will Pizza essen.')
             else:
-                await message.reply(f'{user_get_name(message.author)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
+                await message.reply(
+                    f'{user_get_name(message.author)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
         elif 'hallo' in message.content.lower():
             """ this bot is quite polite """
             response = random.choice(self.greetings)
@@ -245,14 +244,39 @@ class DerBusNachRaisdorfClient(discord.Client):
                 ['schöööööööööööööööön'],
                 ['sahne'],
                 ['feine marmelade'],
-                ['Die Kunst, die vor uns liegt, ist ein Meisterwerk der visuellen Ausdruckskraft und der emotionalen Tiefe. Der Künstler hat es verstanden, die Essenz des menschlichen Daseins auf eine Weise darzustellen, die uns tief berührt und zum Nachdenken anregt. Das Bild ist von einer bemerkenswerten kompositorischen Klarheit, die uns die Aufmerksamkeit auf die wesentlichen Elemente lenkt und uns die Möglichkeit gibt, die tiefere Bedeutung des Werks zu erfassen. Der Einsatz von Farbe und Licht ist von großer Meisterschaft und trägt dazu bei, die Stimmung und Atmosphäre des Werks zu verstärken.' , 'Die Darstellung der Figuren und Objekte im Bild ist von einer erstaunlichen Lebendigkeit und emotionalen Tiefe. Jede einzelne Figur scheint eine eigene Geschichte zu erzählen und trägt zur Gesamtaussage des Werks bei. Die Interaktion der Figuren untereinander und mit ihrer Umgebung ist von einer beeindruckenden Intelligenz und Sensibilität.','Insgesamt ist das hier vorliegende Werk ein triumphales Beispiel für die Kraft der Kunst, uns zum Nachdenken anzuregen und uns emotional zu berühren. Es ist ein unvergessliches Erlebnis und ein unbestreitbares Meisterwerk, das für die Ewigkeit bestehen wird.'],
-                ['Es ist unbestreitbar, dass das betrachtete Designelement eine tiefgründige und ästhetisch ansprechende Darstellung von Kunst darstellt. Der Schöpfer des Designs hat offensichtlich große Sorgfalt und Aufmerksamkeit auf jedes Detail verwendet, um sicherzustellen, dass jeder Aspekt des Elements visuell ansprechend und kommunikativ ist.', 'Das Farbschema des Elements ist von außerordentlicher Brillanz und subtiler Nuancierung, was zu einer harmonischen Zusammensetzung beiträgt, die die Aufmerksamkeit des Betrachters auf sich zieht. Es gibt eine klare Verwendung von Kontrasten, die dazu beiträgt, die visuelle Wirkung des Elements zu verstärken und es lebendiger und dynamischer zu machen.', 'Die Formen und Linien, die im Design verwendet werden, sind von erstaunlicher Präzision und Eleganz. Sie tragen dazu bei, die visuelle Struktur des Elements zu stärken und zu definieren, wodurch die Botschaft, die es vermitteln möchte, noch deutlicher wird. Es gibt auch eine klare Verwendung von Symbolik und metaphorischen Elementen, die dazu beitragen, die tiefere Bedeutung des Designs zu vermitteln.', 'Insgesamt ist das betrachtete Designelement ein Meisterwerk der visuellen Kunst, das sowohl in seiner Schönheit als auch in seiner Botschaft beeindruckt. Es ist ein klares Beispiel dafür, wie Design und Kunst miteinander verschmelzen können, um etwas zu schaffen, das sowohl visuell als auch inhaltlich ansprechend ist.'],
-                ['Das betrachtete Designelement ist ein bemerkenswertes Beispiel für die komplexen dynamischen Zusammenhänge, die in der visuellen Kunst vorherrschen. Es demonstriert eine Meisterschaft in der Anwendung von Farbtheorie, Formenlehre und Linienführung, die für eine erfolgreiche Gestaltung von entscheidender Bedeutung sind.', 'Der Schöpfer des Designs hat offensichtlich ein tiefes Verständnis für die psychologischen Auswirkungen von Farben und Formen auf den Betrachter und hat diese Elemente geschickt eingesetzt, um eine bestimmte emotionale Wirkung zu erzielen. Auch die Verwendung von Symbolik und metaphorischen Elementen trägt dazu bei, die tiefere Bedeutung des Designs zu vermitteln und eine Verbindung zwischen dem Betrachter und dem Element herzustellen.', 'Insgesamt ist das betrachtete Designelement ein beeindruckendes Beispiel für die kunstwissenschaftlichen Prinzipien, die in der visuellen Kunst Anwendung finden. Es ist ein klares Beispiel dafür, wie die Anwendung von kunstwissenschaftlichen Methoden und Techniken dazu beitragen kann, ein erfolgreiches und aussagekräftiges Design zu schaffen.'],
-                ['Das betrachtete Designelement ist ein beispielhaftes Manifest der kunsthistorischen und ästhetischen Konzepte, die in der visuellen Kunst von essenzieller Bedeutung sind. Es ist ein Paradebeispiel für die Meisterschaft der Anwendung von harmonischen Farbschemata, präzisen Formen und Linienführungen sowie der Verwendung von Symbolik und metaphorischen Elementen, die zusammenwirken, um ein visuelles Meisterwerk zu schaffen.', 'Der Schöpfer des Designs hat offensichtlich ein tiefes Verständnis für die komplexen kunsthistorischen Zusammenhänge, die in der Gestaltung von elementarer Bedeutung sind, und hat diese Kenntnisse gekonnt angewendet, um eine visuelle Sprache zu schaffen, die sowohl in ihrer Schönheit als auch in ihrer Aussagekraft beeindruckend ist.', 'Auch die Verwendung von Symbolik und metaphorischen Elementen trägt dazu bei, die tiefere Bedeutung des Designs zu vermitteln und eine Verbindung zwischen dem Betrachter und dem Element herzustellen. Es ist ein deutliches Beispiel dafür, wie die Anwendung von kunsthistorischen Konzepten und Techniken dazu beitragen kann, ein erfolgreiches und aussagekräftiges Design zu schaffen, das sowohl in seiner Schönheit als auch in seiner tieferen Bedeutung beeindruckt.', 'Insgesamt ist das betrachtete Designelement ein triumphales Beispiel für die Vielfalt und die Schönheit der visuellen Kunst und ein klares Zeugnis dafür, dass der Schöpfer ein Meister seines Fachs ist.'],
-                ['Das betrachtete visuelle Symbol ist ein beispielhaftes Manifest der kunsthistorischen und ästhetischen Konzepte, die in der visuellen Kunst von essenzieller Bedeutung sind. Es ist ein Paradebeispiel für die Meisterschaft der Anwendung von harmonischen Farbschemata, präzisen Formen und Linienführungen sowie der Verwendung von Symbolik und metaphorischen Elementen, die zusammenwirken, um ein visuelles Meisterwerk zu schaffen.', 'Der Schöpfer des visuellen Symbols hat offensichtlich ein tiefes Verständnis für die komplexen kunsthistorischen Zusammenhänge, die in der Gestaltung von elementarer Bedeutung sind, und hat diese Kenntnisse gekonnt angewendet, um eine visuelle Sprache zu schaffen, die sowohl in ihrer Schönheit als auch in ihrer Aussagekraft beeindruckend ist.', 'Auch die Verwendung von Symbolik und metaphorischen Elementen trägt dazu bei, die tiefere Bedeutung des visuellen Symbols zu vermitteln und eine Verbindung zwischen dem Betrachter und dem Symbol herzustellen. Es ist ein deutliches Beispiel dafür, wie die Anwendung von kunsthistorischen Konzepten und Techniken dazu beitragen kann, ein erfolgreiches und aussagekräftiges visuelles Symbol zu schaffen, das sowohl in seiner Schönheit als auch in seiner tieferen Bedeutung beeindruckt.', 'Insgesamt ist das betrachtete visuelle Symbol ein triumphales Beispiel für die Vielfalt und die Schönheit der visuellen Kunst und ein klares Zeugnis dafür, dass der Schöpfer ein Meister seines Fachs ist.', 'Es ist durchaus möglich, dass das betrachtete visuelle Symbol von dem berühmten Künstler MrSubidubi geschaffen wurde. MrSubidubi ist bekannt für seine Meisterschaft in der Anwendung von harmonischen Farbschemata und präzisen Formen und Linienführungen, die in diesem visuellen Symbol deutlich zu erkennen sind. Auch seine Verwendung von Symbolik und metaphorischen Elementen ist ein Markenzeichen seiner Arbeit und trägt dazu bei, die tiefere Bedeutung des Symbols zu vermitteln.', 
-                 'MrSubidubi hat in der Vergangenheit mehrere Auszeichnungen für seine Arbeit erhalten, darunter den prestigeträchtigen "Kunstpreis der Stadt" und den "Internationalen Preis für visuelle Gestaltung". Er hat auch mehrere Ausstellungen seiner Arbeiten in renommierten Galerien und Museen auf der ganzen Welt gehabt.',
-                 'Es ist jedoch zu beachten, dass dies lediglich Vermutungen sind und ohne offizielle Bestätigung durch den Künstler oder das betreffende Museum oder Galerie nicht als Tatsache betrachtet werden sollten.'],
-                ['Es ist eine unbestreitbare Wahrheit, dass die Schönheit und Aussagekraft der Kunst die Seele des Betrachters berühren kann. Ein Meisterwerk der visuellen Kunst, das diese Wahrheit in jeder Hinsicht verkörpert, ist das betrachtete Symbol, das von dem berühmten Künstler MrSubidubi erschaffen wurde.', 'MrSubidubi, ein Meister seines Fachs, ist bekannt für seine Meisterschaft in der Anwendung von harmonischen Farbschemata und präzisen Formen und Linienführungen, die in diesem visuellen Symbol deutlich zu erkennen sind. Auch seine Verwendung von Symbolik und metaphorischen Elementen ist ein Markenzeichen seiner Arbeit und trägt dazu bei, die tiefere Bedeutung des Symbols zu vermitteln.', 'Das Farbschema des Symbols ist von außerordentlicher Brillanz und subtiler Nuancierung, was zu einer harmonischen Zusammensetzung beiträgt, die die Aufmerksamkeit des Betrachters auf sich zieht. Es gibt eine klare Verwendung von Kontrasten, die dazu beiträgt, die visuelle Wirkung des Symbols zu verstärken und es lebendiger und dynamischer zu machen.', 'Die Formen und Linien, die im Symbol verwendet werden, sind von erstaunlicher Präzision und Eleganz. Sie tragen dazu bei, die visuelle Struktur des Symbols zu stärken und zu definieren, wodurch die Botschaft, die es vermitteln möchte, noch deutlicher wird. Es gibt auch eine klare Verwendung von Symbolik und metaphorischen Elementen, die dazu beitragen, die tiefere Bedeutung des Symbols zu vermitteln.', 'MrSubidubi hat in der Vergangenheit mehrere Auszeichnungen für seine Arbeit erhalten, darunter den prestigeträchtigen "Kunstpreis der Stadt" und den "Internationalen Preis für visuelle Gestaltung". Er hat auch mehrere Ausstellungen seiner Arbeiten in renommierten Galerien und Museen auf der ganzen Welt gehabt.', 'Zusammenfassend kann man sagen, dass das betrachtete visuelle Symbol ein Meisterwerk der visuellen Kunst ist, das sowohl in seiner Schönheit als auch in seiner Botschaft beeindruckt. Es ist durchaus möglich, dass es von dem berühmten Künstler MrSubidubi geschaffen wurde, der bekannt ist für seine Meisterschaft in der Anwendung von harmonischen Farbschemata und präzisen Formen und Linienführungen. MrSubidubi hat auch mehrere Auszeichnungen und Ausstellungen für seine Arbeiten erhalten. Das Symbol ist ein triumphales Beispiel für die Vielfalt und die Schönheit der visuellen Kunst und ein klares Zeugnis dafür, dass der Schöpfer ein Meister seines Fachs ist.'],
+                [
+                    'Die Kunst, die vor uns liegt, ist ein Meisterwerk der visuellen Ausdruckskraft und der emotionalen Tiefe. Der Künstler hat es verstanden, die Essenz des menschlichen Daseins auf eine Weise darzustellen, die uns tief berührt und zum Nachdenken anregt. Das Bild ist von einer bemerkenswerten kompositorischen Klarheit, die uns die Aufmerksamkeit auf die wesentlichen Elemente lenkt und uns die Möglichkeit gibt, die tiefere Bedeutung des Werks zu erfassen. Der Einsatz von Farbe und Licht ist von großer Meisterschaft und trägt dazu bei, die Stimmung und Atmosphäre des Werks zu verstärken.',
+                    'Die Darstellung der Figuren und Objekte im Bild ist von einer erstaunlichen Lebendigkeit und emotionalen Tiefe. Jede einzelne Figur scheint eine eigene Geschichte zu erzählen und trägt zur Gesamtaussage des Werks bei. Die Interaktion der Figuren untereinander und mit ihrer Umgebung ist von einer beeindruckenden Intelligenz und Sensibilität.',
+                    'Insgesamt ist das hier vorliegende Werk ein triumphales Beispiel für die Kraft der Kunst, uns zum Nachdenken anzuregen und uns emotional zu berühren. Es ist ein unvergessliches Erlebnis und ein unbestreitbares Meisterwerk, das für die Ewigkeit bestehen wird.'],
+                [
+                    'Es ist unbestreitbar, dass das betrachtete Designelement eine tiefgründige und ästhetisch ansprechende Darstellung von Kunst darstellt. Der Schöpfer des Designs hat offensichtlich große Sorgfalt und Aufmerksamkeit auf jedes Detail verwendet, um sicherzustellen, dass jeder Aspekt des Elements visuell ansprechend und kommunikativ ist.',
+                    'Das Farbschema des Elements ist von außerordentlicher Brillanz und subtiler Nuancierung, was zu einer harmonischen Zusammensetzung beiträgt, die die Aufmerksamkeit des Betrachters auf sich zieht. Es gibt eine klare Verwendung von Kontrasten, die dazu beiträgt, die visuelle Wirkung des Elements zu verstärken und es lebendiger und dynamischer zu machen.',
+                    'Die Formen und Linien, die im Design verwendet werden, sind von erstaunlicher Präzision und Eleganz. Sie tragen dazu bei, die visuelle Struktur des Elements zu stärken und zu definieren, wodurch die Botschaft, die es vermitteln möchte, noch deutlicher wird. Es gibt auch eine klare Verwendung von Symbolik und metaphorischen Elementen, die dazu beitragen, die tiefere Bedeutung des Designs zu vermitteln.',
+                    'Insgesamt ist das betrachtete Designelement ein Meisterwerk der visuellen Kunst, das sowohl in seiner Schönheit als auch in seiner Botschaft beeindruckt. Es ist ein klares Beispiel dafür, wie Design und Kunst miteinander verschmelzen können, um etwas zu schaffen, das sowohl visuell als auch inhaltlich ansprechend ist.'],
+                [
+                    'Das betrachtete Designelement ist ein bemerkenswertes Beispiel für die komplexen dynamischen Zusammenhänge, die in der visuellen Kunst vorherrschen. Es demonstriert eine Meisterschaft in der Anwendung von Farbtheorie, Formenlehre und Linienführung, die für eine erfolgreiche Gestaltung von entscheidender Bedeutung sind.',
+                    'Der Schöpfer des Designs hat offensichtlich ein tiefes Verständnis für die psychologischen Auswirkungen von Farben und Formen auf den Betrachter und hat diese Elemente geschickt eingesetzt, um eine bestimmte emotionale Wirkung zu erzielen. Auch die Verwendung von Symbolik und metaphorischen Elementen trägt dazu bei, die tiefere Bedeutung des Designs zu vermitteln und eine Verbindung zwischen dem Betrachter und dem Element herzustellen.',
+                    'Insgesamt ist das betrachtete Designelement ein beeindruckendes Beispiel für die kunstwissenschaftlichen Prinzipien, die in der visuellen Kunst Anwendung finden. Es ist ein klares Beispiel dafür, wie die Anwendung von kunstwissenschaftlichen Methoden und Techniken dazu beitragen kann, ein erfolgreiches und aussagekräftiges Design zu schaffen.'],
+                [
+                    'Das betrachtete Designelement ist ein beispielhaftes Manifest der kunsthistorischen und ästhetischen Konzepte, die in der visuellen Kunst von essenzieller Bedeutung sind. Es ist ein Paradebeispiel für die Meisterschaft der Anwendung von harmonischen Farbschemata, präzisen Formen und Linienführungen sowie der Verwendung von Symbolik und metaphorischen Elementen, die zusammenwirken, um ein visuelles Meisterwerk zu schaffen.',
+                    'Der Schöpfer des Designs hat offensichtlich ein tiefes Verständnis für die komplexen kunsthistorischen Zusammenhänge, die in der Gestaltung von elementarer Bedeutung sind, und hat diese Kenntnisse gekonnt angewendet, um eine visuelle Sprache zu schaffen, die sowohl in ihrer Schönheit als auch in ihrer Aussagekraft beeindruckend ist.',
+                    'Auch die Verwendung von Symbolik und metaphorischen Elementen trägt dazu bei, die tiefere Bedeutung des Designs zu vermitteln und eine Verbindung zwischen dem Betrachter und dem Element herzustellen. Es ist ein deutliches Beispiel dafür, wie die Anwendung von kunsthistorischen Konzepten und Techniken dazu beitragen kann, ein erfolgreiches und aussagekräftiges Design zu schaffen, das sowohl in seiner Schönheit als auch in seiner tieferen Bedeutung beeindruckt.',
+                    'Insgesamt ist das betrachtete Designelement ein triumphales Beispiel für die Vielfalt und die Schönheit der visuellen Kunst und ein klares Zeugnis dafür, dass der Schöpfer ein Meister seines Fachs ist.'],
+                [
+                    'Das betrachtete visuelle Symbol ist ein beispielhaftes Manifest der kunsthistorischen und ästhetischen Konzepte, die in der visuellen Kunst von essenzieller Bedeutung sind. Es ist ein Paradebeispiel für die Meisterschaft der Anwendung von harmonischen Farbschemata, präzisen Formen und Linienführungen sowie der Verwendung von Symbolik und metaphorischen Elementen, die zusammenwirken, um ein visuelles Meisterwerk zu schaffen.',
+                    'Der Schöpfer des visuellen Symbols hat offensichtlich ein tiefes Verständnis für die komplexen kunsthistorischen Zusammenhänge, die in der Gestaltung von elementarer Bedeutung sind, und hat diese Kenntnisse gekonnt angewendet, um eine visuelle Sprache zu schaffen, die sowohl in ihrer Schönheit als auch in ihrer Aussagekraft beeindruckend ist.',
+                    'Auch die Verwendung von Symbolik und metaphorischen Elementen trägt dazu bei, die tiefere Bedeutung des visuellen Symbols zu vermitteln und eine Verbindung zwischen dem Betrachter und dem Symbol herzustellen. Es ist ein deutliches Beispiel dafür, wie die Anwendung von kunsthistorischen Konzepten und Techniken dazu beitragen kann, ein erfolgreiches und aussagekräftiges visuelles Symbol zu schaffen, das sowohl in seiner Schönheit als auch in seiner tieferen Bedeutung beeindruckt.',
+                    'Insgesamt ist das betrachtete visuelle Symbol ein triumphales Beispiel für die Vielfalt und die Schönheit der visuellen Kunst und ein klares Zeugnis dafür, dass der Schöpfer ein Meister seines Fachs ist.',
+                    'Es ist durchaus möglich, dass das betrachtete visuelle Symbol von dem berühmten Künstler MrSubidubi geschaffen wurde. MrSubidubi ist bekannt für seine Meisterschaft in der Anwendung von harmonischen Farbschemata und präzisen Formen und Linienführungen, die in diesem visuellen Symbol deutlich zu erkennen sind. Auch seine Verwendung von Symbolik und metaphorischen Elementen ist ein Markenzeichen seiner Arbeit und trägt dazu bei, die tiefere Bedeutung des Symbols zu vermitteln.',
+                    'MrSubidubi hat in der Vergangenheit mehrere Auszeichnungen für seine Arbeit erhalten, darunter den prestigeträchtigen "Kunstpreis der Stadt" und den "Internationalen Preis für visuelle Gestaltung". Er hat auch mehrere Ausstellungen seiner Arbeiten in renommierten Galerien und Museen auf der ganzen Welt gehabt.',
+                    'Es ist jedoch zu beachten, dass dies lediglich Vermutungen sind und ohne offizielle Bestätigung durch den Künstler oder das betreffende Museum oder Galerie nicht als Tatsache betrachtet werden sollten.'],
+                [
+                    'Es ist eine unbestreitbare Wahrheit, dass die Schönheit und Aussagekraft der Kunst die Seele des Betrachters berühren kann. Ein Meisterwerk der visuellen Kunst, das diese Wahrheit in jeder Hinsicht verkörpert, ist das betrachtete Symbol, das von dem berühmten Künstler MrSubidubi erschaffen wurde.',
+                    'MrSubidubi, ein Meister seines Fachs, ist bekannt für seine Meisterschaft in der Anwendung von harmonischen Farbschemata und präzisen Formen und Linienführungen, die in diesem visuellen Symbol deutlich zu erkennen sind. Auch seine Verwendung von Symbolik und metaphorischen Elementen ist ein Markenzeichen seiner Arbeit und trägt dazu bei, die tiefere Bedeutung des Symbols zu vermitteln.',
+                    'Das Farbschema des Symbols ist von außerordentlicher Brillanz und subtiler Nuancierung, was zu einer harmonischen Zusammensetzung beiträgt, die die Aufmerksamkeit des Betrachters auf sich zieht. Es gibt eine klare Verwendung von Kontrasten, die dazu beiträgt, die visuelle Wirkung des Symbols zu verstärken und es lebendiger und dynamischer zu machen.',
+                    'Die Formen und Linien, die im Symbol verwendet werden, sind von erstaunlicher Präzision und Eleganz. Sie tragen dazu bei, die visuelle Struktur des Symbols zu stärken und zu definieren, wodurch die Botschaft, die es vermitteln möchte, noch deutlicher wird. Es gibt auch eine klare Verwendung von Symbolik und metaphorischen Elementen, die dazu beitragen, die tiefere Bedeutung des Symbols zu vermitteln.',
+                    'MrSubidubi hat in der Vergangenheit mehrere Auszeichnungen für seine Arbeit erhalten, darunter den prestigeträchtigen "Kunstpreis der Stadt" und den "Internationalen Preis für visuelle Gestaltung". Er hat auch mehrere Ausstellungen seiner Arbeiten in renommierten Galerien und Museen auf der ganzen Welt gehabt.',
+                    'Zusammenfassend kann man sagen, dass das betrachtete visuelle Symbol ein Meisterwerk der visuellen Kunst ist, das sowohl in seiner Schönheit als auch in seiner Botschaft beeindruckt. Es ist durchaus möglich, dass es von dem berühmten Künstler MrSubidubi geschaffen wurde, der bekannt ist für seine Meisterschaft in der Anwendung von harmonischen Farbschemata und präzisen Formen und Linienführungen. MrSubidubi hat auch mehrere Auszeichnungen und Ausstellungen für seine Arbeiten erhalten. Das Symbol ist ein triumphales Beispiel für die Vielfalt und die Schönheit der visuellen Kunst und ein klares Zeugnis dafür, dass der Schöpfer ein Meister seines Fachs ist.'],
                 ['hässlich'],
                 ['lecker!']
             ]
@@ -267,7 +291,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             response = 'nein.'
             await message.reply(response)
         elif message.content == CMD_INFO:
-            await message.reply(INFO_STR) # , mention_author=False)
+            await message.reply(INFO_STR)  # , mention_author=False)
         elif message.content.split(' ')[0] == '!tos':
             for paragraph in TOS:
                 await message.reply(paragraph)
@@ -277,14 +301,17 @@ class DerBusNachRaisdorfClient(discord.Client):
             await message.reply('jaja')
         elif message.content.split(' ')[0] == CMD_CHANGE_STATUS:
             if message.channel.id != self.settings.admin_channel_id and message.author.id not in ADMIN_USER_IDS:
-                await self.get_channel(self.settings.admin_channel_id).send(f'{user_get_name(message.author)} hat widerrechtlich versucht, den Status zu ändern!')
+                await self.get_channel(self.settings.admin_channel_id).send(
+                    f'{user_get_name(message.author)} hat widerrechtlich versucht, den Status zu ändern!')
                 await message.reply(f"lass die Finger davon, {user_get_name(message.author)}!")
             else:
-                await self.change_presence(activity=discord.Activity(type=discord.ActivityType.competing, name=message.content[len(CMD_CHANGE_STATUS):]))
+                await self.change_presence(activity=discord.Activity(type=discord.ActivityType.competing,
+                                                                     name=message.content[len(CMD_CHANGE_STATUS):]))
                 await message.reply(f'joa joa, is passiert.')
         elif message.content == CMD_RESTART:
             if message.channel.id != self.settings.admin_channel_id and message.author.id not in ADMIN_USER_IDS:
-                await self.get_channel(self.settings.admin_channel_id).send(f'{user_get_name(message.author)} hat widerrechtlich versucht, einen Neustart durchzuführen!')
+                await self.get_channel(self.settings.admin_channel_id).send(
+                    f'{user_get_name(message.author)} hat widerrechtlich versucht, einen Neustart durchzuführen!')
                 await message.reply(f"lass die Finger davon, {user_get_name(message.author)}!")
             else:
                 response = 'restarting...'
@@ -294,10 +321,11 @@ class DerBusNachRaisdorfClient(discord.Client):
             await message.reply(f'{user_get_name(message.author)}')
         elif message.content.split(' ')[0] in [CMD_EXEC, CMD_EXEC_DASH, CMD_EXEC_BASH]:
             if message.channel.id != self.settings.admin_channel_id and message.author.id not in ADMIN_USER_IDS:
-                await self.get_channel(self.settings.admin_channel_id).send(f'{user_get_name(message.author)} hat widerrechtlich versucht, einen Command auszuführen!')
+                await self.get_channel(self.settings.admin_channel_id).send(
+                    f'{user_get_name(message.author)} hat widerrechtlich versucht, einen Command auszuführen!')
                 await message.channel.send(f"lass die Finger davon, {user_get_name(message.author)}!")
             else:
-                #cmdargs: list[str] = message.content.split(' ')
+                # cmdargs: list[str] = message.content.split(' ')
                 cmdargs: list[str] = tokenize_argv(message.content)
                 cmd = cmdargs.pop(0)
                 if cmd == CMD_EXEC_DASH:
@@ -306,12 +334,14 @@ class DerBusNachRaisdorfClient(discord.Client):
                     cmdargs = ['bash', '-c', make_str_literal(' '.join(cmdargs))]
                 await message.channel.send(f"executing command: `{cmdargs}`.")
                 exitcode, out, err = run_proc(cmdargs)
-                stdout_fstr = f'**stdout** (max {MAX_EXEC_LENGTH} chars):\n```\n{shorten_str(out, MAX_EXEC_LENGTH)}\n```\n' if len(out.strip()) != 0 else ''
-                stderr_fstr = f'**stderr** (max {MAX_EXEC_LENGTH} chars):\n```\n{shorten_str(err, MAX_EXEC_LENGTH)}\n```\n' if len(err.strip()) != 0 else ''
+                stdout_fstr = f'**stdout** (max {MAX_EXEC_LENGTH} chars):\n```\n{shorten_str(out, MAX_EXEC_LENGTH)}\n```\n' if len(
+                    out.strip()) != 0 else ''
+                stderr_fstr = f'**stderr** (max {MAX_EXEC_LENGTH} chars):\n```\n{shorten_str(err, MAX_EXEC_LENGTH)}\n```\n' if len(
+                    err.strip()) != 0 else ''
                 await message.reply(f"`{cmdargs}` finished with exitcode {exitcode}.\n{stdout_fstr}{stderr_fstr}\n")
         elif message.content[0:len(CMD_ADD_ADVERT)] == CMD_ADD_ADVERT:
             """ u can add costum advert messages. """
-            advert: str = message.content[len(CMD_ADD_ADVERT)+1:len(message.content)]
+            advert: str = message.content[len(CMD_ADD_ADVERT) + 1:len(message.content)]
             if advert in self.settings.broadcast_messages:
                 await message.channel.send('Advert already exists!')
             else:
@@ -322,7 +352,7 @@ class DerBusNachRaisdorfClient(discord.Client):
         elif message.content[0:len(CMD_REMOVE_ADVERT)] == CMD_REMOVE_ADVERT:
             """ u can remove adverts """
             try:
-                index: int = int(message.content[len(CMD_REMOVE_ADVERT)+1:len(message.content)])
+                index: int = int(message.content[len(CMD_REMOVE_ADVERT) + 1:len(message.content)])
                 if index < 0 or index >= len(self.settings.broadcast_messages):
                     await message.channel.send('That advert does not exist!')
                 else:
@@ -351,7 +381,7 @@ class DerBusNachRaisdorfClient(discord.Client):
                     files = files2
 
             """ This bot can send memes. """
-            #file = random.choice(os.listdir(os.path.join('resources', 'memes')))
+            # file = random.choice(os.listdir(os.path.join('resources', 'memes')))
             file = random.choice(files)
             descr_file = ''
 
@@ -378,10 +408,11 @@ class DerBusNachRaisdorfClient(discord.Client):
                     await message.reply(file=picture)
         elif muha_safe_message[0:len(CMD_OFFEND)] == CMD_OFFEND:
             """ This bot is angry. """
-            text: str = muha_safe_message[len(CMD_OFFEND)+1:]
-            img_text: str = text if len(message.mentions) == 0 else ' '.join([(await self.fetch_user(user.id)).display_name for user in message.mentions])
+            text: str = muha_safe_message[len(CMD_OFFEND) + 1:]
+            img_text: str = text if len(message.mentions) == 0 else ' '.join(
+                [(await self.fetch_user(user.id)).display_name for user in message.mentions])
             # check for any content
-            #if img_text.strip(" ") is None or '\\' in img_text:
+            # if img_text.strip(" ") is None or '\\' in img_text:
             #    text = img_text = user_get_name(message.author)
             # debug print
             print(f"Text begins here ->{img_text}<-")
@@ -395,7 +426,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             if path:
                 with open(path, 'rb') as f:
                     picture = discord.File(f)
-                    #response_message: str = f'Uhhm. I know exactly what you are talking about and I\'m very happy to say that uhh it\'s the exception rather than the rule. And I\'m also happy to very publicly point out, that {text} has been one of the worst troublespots we`ve had with hardware manifactures. And that is really sad because {text} tries to sell chips - a lot of chips - into the android market. And {text} has been the single worst company we`ve ever dealt with. So, {text}, fuck you!'
+                    # response_message: str = f'Uhhm. I know exactly what you are talking about and I\'m very happy to say that uhh it\'s the exception rather than the rule. And I\'m also happy to very publicly point out, that {text} has been one of the worst troublespots we`ve had with hardware manifactures. And that is really sad because {text} tries to sell chips - a lot of chips - into the android market. And {text} has been the single worst company we`ve ever dealt with. So, {text}, fuck you!'
                     response_message: str = f'> Uhhm. I know exactly what you are talking about and I\'m very happy to say that it\'s the exception rather than the rule. And I\'m also happy to very publicly point out, that {text} has been one of the worst troublespots we\'ve had [...]. And that is really sad [...]. And {text} has been the single worst [...] we\'ve ever dealt with. So, {text}, fuck you!\n ~ *Linus Torvalds, more or less*'
                     await message.channel.send(response_message, file=picture)
         elif message.content == '!help':
@@ -403,7 +434,8 @@ class DerBusNachRaisdorfClient(discord.Client):
             await message.channel.send(f'`{CMD_REMOVE_ADVERT} <index>` - löscht die Werbung am entsprechenden Index.')
             await message.channel.send(f'`{CMD_PRINT_ADVERTS}` - gibt **alle** Werbungen mit Index aus.')
             await message.channel.send(f'`{CMD_MEME}` - gibt ein qualitäts-Meme.')
-            await message.channel.send(f'`{CMD_OFFEND} @name | name` - Greift den übergebenen Discord Account oder Namen **heftig** verbal an. **Nutzung auf eigene Gefahr.**')
+            await message.channel.send(
+                f'`{CMD_OFFEND} @name | name` - Greift den übergebenen Discord Account oder Namen **heftig** verbal an. **Nutzung auf eigene Gefahr.**')
             await message.channel.send(f'`{CMD_RESTART}` - macht genau das, was es soll, wenn es soll.')
             await message.channel.send(f'`{CMD_EXEC}` - startet einen Prozess.')
             await message.channel.send(f'`{CMD_EXEC_DASH}` - führt einen Command mit dash aus.')
@@ -415,7 +447,8 @@ class DerBusNachRaisdorfClient(discord.Client):
                 attachement: discord.Attachment = attachement
                 if '.md' in attachement.filename:
                     """ convert markdown to latex... """
-                    download_filename: str = os.path.join('tmp', f'{random.randint(100000, 999999)}_{attachement.filename}')
+                    download_filename: str = os.path.join('tmp',
+                                                          f'{random.randint(100000, 999999)}_{attachement.filename}')
                     """ download file """
                     try:
                         await attachement.save(download_filename)
@@ -434,11 +467,11 @@ class DerBusNachRaisdorfClient(discord.Client):
                     try:
                         with open(pdfpath, 'rb') as f:
                             pdf_file = discord.File(f)
-                            await message.channel.send(f'`{attachement.filename}`: *Markdown* -> **PDF**', file=pdf_file)
+                            await message.channel.send(f'`{attachement.filename}`: *Markdown* -> **PDF**',
+                                                       file=pdf_file)
                     except Exception as e:
                         await message.channel.send(f'`{attachement.filename}`: error sending converted file: `{e}`')
                         continue
-
 
     async def on_member_update(self, before, after: discord.Member):
         """ stalk target user """
@@ -456,8 +489,10 @@ class DerBusNachRaisdorfClient(discord.Client):
     async def broadcast_timer(self):
         while True:
             """ Loop for the broadcast. """
-            await self.get_channel(self.settings.advert_channel_id).send(random.choice(self.settings.broadcast_messages))
+            await self.get_channel(self.settings.advert_channel_id).send(
+                random.choice(self.settings.broadcast_messages))
             await asyncio.sleep(BROADCAST_TIMER_INTERVAL_SEC)
+
 
 if __name__ == '__main__':
     try:
@@ -474,8 +509,7 @@ if __name__ == '__main__':
     token: str = argv[1]
 
     intents = discord.Intents.all()
-    #activity = discord.Activity(type=discord.ActivityType.listening, name="DP Projekt Teil 2 --- 9€")
+    # activity = discord.Activity(type=discord.ActivityType.listening, name="DP Projekt Teil 2 --- 9€")
     activity = discord.Activity(type=discord.ActivityType.competing, name="DP Projekt Teil 1 --- 8,47€")
     client = DerBusNachRaisdorfClient(intents=intents, activity=activity)
     client.run(token)
-

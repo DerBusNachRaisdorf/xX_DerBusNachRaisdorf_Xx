@@ -50,8 +50,9 @@ command_mapping: {str: callable(Context)} = {
 commands = {*command_mapping.keys()}
 
 
-def call_if_command(context: Context) -> bool:
+async def call_if_command(context: Context) -> bool:
     command = context.command
+    await context.message.reply(command)
     # check if handled
     if command not in commands:
         return False
