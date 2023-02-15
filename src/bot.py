@@ -48,6 +48,21 @@ MAX_EXEC_LENGTH: int = 800
 
 LEGAL_CHARS: set = {*' !abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVXWYZöüäÖÜÄ?ß1234567890_-.:,;|<>/#+*~@'}
 
+TOS: list[str] = [
+    "***Terms of Service für xX_DerBusNachRaisdorf_Xx***",
+    "**1. Nutzung des Bots**  \n> a. Die Verwendung des Bots erfolgt auf eigene Gefahr. Wir übernehmen keine Haftung für Schäden, die durch die Nutzung des Bots entstehen.  \n> b. Der Bot darf nur für den privaten Gebrauch genutzt werden. Eine kommerzielle Nutzung ist untersagt.  \n> c. Wir behalten uns das Recht vor, die Funktionen des Bots jederzeit und ohne Ankündigung zu ändern oder zu entfernen.  ",
+    "**2. Verbotene Handlungen**  \n> a. Es ist nicht gestattet, unangebrachte oder geschichtlich negativ belegte Symbole zu verwenden.  \n> b. Das Suchen nach Schwachstellen in dem !offend Command und das Ausnutzen dieser Schwachstellen ist untersagt.  \n> c. *Nils ist explizit verboten, gegen diese Bestimmungen zu verstoßen.*",
+    "**3. Verantwortlichkeit der Nutzer**  \n> a. Jeder Nutzer ist selbst für die Inhalte verantwortlich, die er über den Bot verbreitet.  \n> b. Es ist verboten, Inhalte zu verbreiten, die gegen geltendes Recht verstoßen.  \n> c. Der Nutzer haftet für alle Schäden, die durch seine Handlungen entstehen.  ",
+    "**4. Haftungsausschluss**  \n> a. Wir übernehmen keine Haftung für die Inhalte, die über den Bot verbreitet werden.  \n> b. Wir übernehmen keine Haftung für Schäden, die durch die Nutzung des Bots entstehen.  \n> c. Wir übernehmen keine Haftung für Ausfälle oder Störungen des Bots.  ",
+    "**5. Änderungen der Terms of Service**  \n> a. Wir behalten uns das Recht vor, die Terms of Service jederzeit und ohne Ankündigung zu ändern.  \n> b. Die Änderungen werden über den Bot bekannt gegeben.  ",
+    "**6. Meme-Regelung**  \n> a. Memes sind ausdrücklich erlaubt, solange sie nicht gegen die Verbotenen Handlungen verstoßen.  \n> b. Memes dürfen keine urheberrechtlich geschützten Inhalte enthalten.  \n> c. Wir behalten uns das Recht vor, Memes zu entfernen, die gegen diese Bestimmungen verstoßen.  \n> d. Memes müssen lustig sein, um verbreitet zu werden.  ",
+    "**7. Weitere Bestimmungen**  \n> a. Jeder Nutzer muss mindestens einen Witz pro Woche in einem dafür vorgesehenen Channel posten.  \n> b. Der Gebrauch von "xD", "lol" oder "rofl" wird ausdrücklich ermutigt.\n> c. Bei Verstoß gegen diese Bestimmungen kann eine Strafe in Form eines virtuellen Kekses verhängt werden.  \n> d. Alle Nutzer müssen einmal pro Woche in einer Karaoke-Nacht ihr Lieblingslied performen.  ",
+    "**8. Kreativitätsfördernde Ergänzungen**  \n> a. Jeder Nutzer muss eine wöchentliche Umfrage zu einer wichtigen Frage stellen, z.B. \"Was ist besser: Katzen oder Hunde?\"  \n> b. Das Nutzen von Emojis, die nichts mit dem Inhalt der Nachricht zu tun haben, wird empfohlen.  \n> c. Es ist verboten, in einem Voice-Channel zu sprechen, ohne dabei eine lustige Mütze oder Kopfbedeckung zu tragen.  \n> d. Mindestens einmal pro Woche müssen alle Nutzer ein Selfie von sich in einem Discord-Channel posten.  \n> e. Wenn ein Nutzer einen Rechtschreibfehler macht, muss er einen Limerick schreiben, um ihn zu korrigieren.  \n> f. Der "Satz des Tages" muss jeden Tag um Punkt 12 Uhr Mittags von einem Nutzer gepostet werden.  \n> g. Es ist verboten, das Wort "Hallo" zu benutzen. Stattdessen muss jeder Nutzer eine andere Begrüßung verwenden.  ",
+    "**9. Spezielle Verhaltensregeln für *einen* bestimmten Nutzer zur Vermeidung unangemessener Nutzung des Bots**  \n> *Nils ist ausdrücklich untersagt, jegliche Art von geschichtlich negativ konnotierten Symbolen in seinen Nachrichten zu verwenden.*  \n> Dies schließt, aber ist nicht beschränkt auf, Hakenkreuze, Keltenkreuze oder andere Symbole ein, die in irgendeiner Form mit Rassismus, Antisemitismus, Fremdenfeindlichkeit oder anderen Formen von Hass und Diskriminierung in Verbindung gebracht werden können. Bei Verstoß gegen diese Bestimmung wird Nils sofort vom Bot ausgeschlossen.  ",
+    "**10. Unsicherheiten und Änderungen**  \n> Sollten Unsicherheiten bezüglich dieser Nutzungsbedingungen bestehen oder Änderungsvorschläge vorliegen, kann der Nutzer sich direkt an ChatGPT wenden. Für die Übernahme einer geänderten Version oder Interpretation der Nutzungsbedingungen ist jedoch die Zustimmung eines Administrators des Discord-Servers \"CAU-Elite\" erforderlich.",
+    "Mit der Nutzung des Bots akzeptieren Sie automatisch diese Terms of Service, einschließlich der kreativitätsfördernden Ergänzungen und der expliziten Bestimmung, dass Nils ebenfalls alle hier genannten Bestimmungen einhalten muss. Bei Verstoß gegen diese Bestimmungen behalten wir uns das Recht vor, den Zugang zum Bot zu sperren."
+]
+
 
 def make_muha_safe(s: str) -> str:
     return ''.join(c if c in LEGAL_CHARS else '' for c in s)
@@ -272,6 +287,9 @@ class DerBusNachRaisdorfClient(discord.Client):
             await message.reply(response)
         elif message.content == CMD_INFO:
             await message.reply(INFO_STR) # , mention_author=False)
+        elif message.content.split(' ')[0] == '!tos':
+            for paragraph in TOS:
+                await message.reply(paragraph)
         elif muha_safe_message[0:len('!nils')] == '!nils':
             if random.randint(0, 6) == 0:
                 try:
