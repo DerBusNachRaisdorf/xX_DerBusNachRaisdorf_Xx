@@ -176,7 +176,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             return
 
         try:
-            discord_role = discord.utils.get(member.guild.roles, name=user.role)
+            discord_role = await discord.utils.get(member.guild.roles, name=user.role)
             await member.add_roles(discord_role)
             print(f'Added Role "{user.role}" to "{user.name}".')
         except:
