@@ -170,13 +170,17 @@ class DerBusNachRaisdorfClient(discord.Client):
         if not user:
             print('Ein unbekannter User ist gejoint!')
             return
-        if user.role != '' and user.role != None:
-            try:
-                discord_role = discord.utils.get(user.guild.roles, name=user.role)
-                await member.add_roles(discord_role)
-                print(f'Added Role "{user.role}" to "{user.name}".')
-            except:
-                print(f'Konnte Rolle "{user.role}" für "{user.name}" nicht wieder herstellen.')
+
+        if user.role == '' or not user.role:
+            print(f'Der Nutzer ohne Rolle "{user.name}" ist gejoint!')
+
+        try:
+            discord_role = discord.utils.get(user.guild.roles, name=user.role)
+            await member.add_roles(discord_role)
+            print(f'Added Role "{user.role}" to "{user.name}".')
+        except:
+            print(f'Konnte Rolle "{user.role}" für "{user.name}" nicht wieder herstellen.')
+        
 
     async def on_message(self, message: discord.Message):
         # ja lies halt
