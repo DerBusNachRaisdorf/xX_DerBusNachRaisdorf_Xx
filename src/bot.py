@@ -167,8 +167,9 @@ class DerBusNachRaisdorfClient(discord.Client):
 
         """ (re-)assign role """
         user = get_raisdorfuser(member)
-        if not user:
-            print('Ein unbekannter User ist gejoint!')
+        if user is None:
+            await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,
+                                                                 name="Unbekannter User beim Joinen"))
             return
 
         if user.role == '' or not user.role:
@@ -176,12 +177,11 @@ class DerBusNachRaisdorfClient(discord.Client):
             return
 
         try:
-            discord_role = await discord.utils.get(member.guild.roles, name=user.role)
+            discord_role = discord.utils.get(member.guild.roles, name=user.role)
             await member.add_roles(discord_role)
             print(f'Added Role "{user.role}" to "{user.name}".')
         except:
             print(f'Konnte Rolle "{user.role}" für "{user.name}" nicht wieder herstellen.')
-        
 
     async def on_message(self, message: discord.Message):
         # ja lies halt
