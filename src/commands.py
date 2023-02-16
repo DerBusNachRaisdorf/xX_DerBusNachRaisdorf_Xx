@@ -40,7 +40,7 @@ async def __cmd_ban_id(context: Context, user_id: int):
 
 
 async def __cmd_get_raisdorfuser_by_name(ctx: Context):
-    if len(ctx.argv < 2):
+    if len(ctx.argv) < 2:
         await ctx.message.reply('not enough arguments')
         return
     
