@@ -4,8 +4,6 @@ def tokenize_argv(cmd: str) -> list[str]:
     is_str: bool = False
     is_esc: bool = False
     for c in cmd:
-        if c == "!" and not cur_token and not argv:
-            continue
         if c == '"' and not is_esc:
             is_str = not is_str
         elif c == '\\' and not is_esc:

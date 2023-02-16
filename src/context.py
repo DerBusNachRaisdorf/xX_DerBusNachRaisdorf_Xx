@@ -12,5 +12,5 @@ class Context:
         # tokenize content
         self.argv: list[str] = tokenize_argv(message.content)
         # save command
-        self.command: str = self.argv[0].lower() if len(self.argv) else ''
+        self.command: str = self.argv[0][1:].lower() if len(self.argv) and self.argv[0][0] == '!' else None
         self.settings: Settings = settings
