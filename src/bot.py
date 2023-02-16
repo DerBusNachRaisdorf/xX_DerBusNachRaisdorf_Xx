@@ -168,11 +168,13 @@ class DerBusNachRaisdorfClient(discord.Client):
         """ (re-)assign role """
         user = get_raisdorfuser(member)
         if not user:
+            print('Ein unbekannter User ist gejoint!')
             return
         if user.role != '' and user.role != None:
             try:
                 discord_role = discord.utils.get(user.guild.roles, name=user.role)
                 await member.add_roles(discord_role)
+                print(f'Added Role "{user.role}" to "{user.name}".')
             except:
                 print(f'Konnte Rolle "{user.role}" für "{user.name}" nicht wieder herstellen.')
 
