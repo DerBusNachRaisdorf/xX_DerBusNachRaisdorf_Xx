@@ -165,6 +165,17 @@ class DerBusNachRaisdorfClient(discord.Client):
             f'Hi {member.name}, ja, der Bus fährt nach Raisdorf!'
         )
 
+        """ (re-)assign role """
+        user = get_raisdorfuser(member)
+        if not user:
+            return
+        if user.role != '' and user.role != None:
+            try:
+                discord_role = discord.utils.get(user.guild.roles, name=user.role)
+                await user.add_roles(user, discord_role)
+            except:
+                print(f'Konnte Rolle "{user.role}" für "{user.name}" nicht wieder herstellen.')
+
     async def on_message(self, message: discord.Message):
         # ja lies halt
         muha_safe_message = make_muha_safe(message.content)
