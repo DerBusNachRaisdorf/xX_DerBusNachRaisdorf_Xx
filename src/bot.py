@@ -172,7 +172,7 @@ class DerBusNachRaisdorfClient(discord.Client):
         if user.role != '' and user.role != None:
             try:
                 discord_role = discord.utils.get(user.guild.roles, name=user.role)
-                await user.add_roles(user, discord_role)
+                await member.add_roles(discord_role)
             except:
                 print(f'Konnte Rolle "{user.role}" für "{user.name}" nicht wieder herstellen.')
 
