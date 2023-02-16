@@ -173,6 +173,7 @@ class DerBusNachRaisdorfClient(discord.Client):
 
         if user.role == '' or not user.role:
             print(f'Der Nutzer ohne Rolle "{user.name}" ist gejoint!')
+            return
 
         try:
             discord_role = discord.utils.get(user.guild.roles, name=user.role)
