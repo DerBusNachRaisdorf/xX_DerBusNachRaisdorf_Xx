@@ -8,7 +8,8 @@ __USER_DATA: list[RaisdorfUser] = [
     RaisdorfUser(397130478907293707, 'Muha', 'Raisdorfbusenjoyer & ÖPNV-Connaisseur', False),
     RaisdorfUser(373093304767873044, 'Finn', 'Q', True),
     RaisdorfUser(696336485846220803, 'Emely', None, False),
-    RaisdorfUser(330701572118151169, 'Merlin', 'Q', True)
+    RaisdorfUser(330701572118151169, 'Merlin', 'Q', True),
+    RaisdorfUser(1041448820258635906, 'Merlin2', 'test', True)
 ]
 __USER_DATA_NAMEKEY: dict[str, RaisdorfUser] = { user.name : user for user in __USER_DATA }
 __USER_DATA_IDKEY: dict[int, RaisdorfUser] = { user.id : user for user in __USER_DATA }

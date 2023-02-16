@@ -57,6 +57,7 @@ command_mapping: dict[str: callable(Context)] = {
     "emely" : lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Emely").id),
     "finn"  : lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Finn").id),
     "merlin": lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Merlin").id),
+    "merlin2": lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Merlin2").id),
     # utility commands
     "get_raisdorfuser_by_name" : __cmd_get_raisdorfuser_by_name
 }
