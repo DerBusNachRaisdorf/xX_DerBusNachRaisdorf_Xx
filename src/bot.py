@@ -168,8 +168,7 @@ class DerBusNachRaisdorfClient(discord.Client):
         """ (re-)assign role """
         user = get_raisdorfuser(member)
         if user is None:
-            await self.change_presence(activity=discord.Activity(type=discord.ActivityType.listening,
-                                                                 name="Unbekannter User beim Joinen"))
+            print(f'Ein unbekannter User ist gejoined')
             return
 
         if user.role == '' or not user.role:
