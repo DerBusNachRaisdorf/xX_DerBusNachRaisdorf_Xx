@@ -20,7 +20,7 @@ async def __cmd_ban_id(context: Context, user_id: int):
             body += f'Link: {SERVER_INVITE_LINK}\n\nMit freundlichen Grüßen\nIhr Bus nach Raisdorf\n'
             mememail_send(smtp_host, sender, password, subject, body)
         except Exception as e:
-            await message.replay(f'Konnte email nicht senden: {e}.')
+            await message.reply(f'Konnte email nicht senden: {e}.')
     # get message
     message = context.message
     # special case
