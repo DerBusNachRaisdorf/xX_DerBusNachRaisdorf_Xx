@@ -31,7 +31,11 @@ async def __cmd_ban_id(context: Context, user_id: int):
             kickmsgs: list[str] = [
                 "https://tenor.com/view/penguin-hit-head-smack-head-funny-fall-gif-16306739",
                 "https://tenor.com/view/moris-cipson-twoj-stary-twoja-stara-minecraft-fortnite"
-                "-xd-beka-memy-memes-mem-call-of-duty-warzone-bedoes-gif-20247198"
+                "-xd-beka-memy-memes-mem-call-of-duty-warzone-bedoes-gif-20247198",
+                "https://tenor.com/view/metro-itmek-push-gif-19915491",
+                "https://tenor.com/view/trap-door-bye-elimination-loser-ellen-degeneres-gif-10498098",
+                "https://tenor.com/view/muppets-fozzie-kermit-trap-door-bye-gif-22005102",
+                "https://tenor.com/view/chris-rock-gif-25292321"
             ]
             await message.reply(random.choice(kickmsgs))
             return
@@ -39,7 +43,12 @@ async def __cmd_ban_id(context: Context, user_id: int):
             print(f'Can not ban Nils: {e}')
             await message.reply("Leider nicht!")
     # send fail
-    await message.reply("https://tenor.com/view/supernatural-deanwinchester-cartoon-gun-bang-gif-4867452")
+    fails = ["https://tenor.com/view/matrix-dodge-neo-gif-13288848",
+             "https://tenor.com/view/supernatural-deanwinchester-cartoon-gun-bang-gif-4867452",
+             "https://tenor.com/view/anime-dodge-dancing-gif-9449699",
+             "https://tenor.com/view/dodge-the-matrix-swerve-lunge-dive-gif-22197111"
+             ]
+    await message.reply(random.choice(fails))
 
 
 async def __cmd_get_raisdorfuser_by_name(ctx: Context):
