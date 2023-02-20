@@ -13,15 +13,17 @@ async def __cmd_ban_id(context: Context, user_id: int):
                             "you-have-no-power-here-lotr-the-lord-of-the-rings-gandalf-gif-17924404")
         return
     # normal gamble
-    if random.randint(0, 1) == 0:
+    if random.randint(0, 5) == 0:
         try:
             # fetch nils
             nils = await message.guild.query_members(user_ids=[user_id])
-            await message.reply("no result!" if not nils else " ".join(map(str, nils)))
             nils = nils[0]
-            # send dm
-            await nils.create_dm()
-            await nils.dm_channel.send('https://discord.gg/ZdSQEFfcHw')
+            # send dm if possible
+            try:
+                await nils.create_dm()
+                await nils.dm_channel.send('https://discord.gg/ZdSQEFfcHw')
+            except:
+                pass
             # kick
             reason = ' '.join(context.argv[1:])
             await nils.kick(reason=reason)
