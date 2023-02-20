@@ -18,7 +18,7 @@ async def __cmd_ban_id(context: Context, user_id: int):
             body = f'Guten Tag {raisuser.name}!\n\nSie wurden von {get_raisdorfuser(context.message.author)} gekickt.\n\n'
             body += f'{get_raisdorfuser(context.message.author)} entschuldigt sich für sein Fehlverhalten und möchte Sie dazu ermutigen, dem Server wieder beizutreten.\n\n'
             body += f'Link: {SERVER_INVITE_LINK}\n\nMit freundlichen Grüßen\nIhr Bus nach Raisdorf\n'
-            mememail_send(smtp_host, sender, password, subject, body)
+            mememail_send(smtp_host, sender, raisuser.mail, password, subject, body)
         except Exception as e:
             await message.reply(f'Konnte email nicht senden: {e}.')
     # get message
