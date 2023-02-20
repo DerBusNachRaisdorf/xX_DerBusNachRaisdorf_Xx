@@ -61,7 +61,7 @@ async def __cmd_ban_id(context: Context, user_id: int):
             return
         except Exception as e:
             print(f'Can not ban Nils: {e}')
-            await message.reply(f"Leider nicht!: {e}")
+            await message.reply(f"Leider nicht!: {e} : {nils}")
     # send fail
     fails = ["https://tenor.com/view/matrix-dodge-neo-gif-13288848",
              "https://tenor.com/view/supernatural-deanwinchester-cartoon-gun-bang-gif-4867452",
