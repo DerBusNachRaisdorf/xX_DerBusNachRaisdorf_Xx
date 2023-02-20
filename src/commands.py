@@ -2,9 +2,25 @@ import random
 
 from settings import *
 from context import Context
+from utility.mememail import mememail_send
+
+SERVER_INVITE_LINK: str = 'https://discord.gg/ZdSQEFfcHw'
 
 
 async def __cmd_ban_id(context: Context, user_id: int):
+    async def send_kickmail():
+        try:
+            raisuser = get_raisdorfuser_by_id(user_id)
+            smtp_host = context.settings.email_smtp_host
+            sender = context.settings.email_sender
+            password = context.settings.email_password
+            subject = 'Der Bus rollt an, bitte steigen Sie ein.'
+            body = f'Guten Tag {raisuser.name}!\n\nSie wurden von {get_raisdorfuser(context.message.author)} gekickt.\n\n'
+            body += f'{get_raisdorfuser(context.message.author)} entschuldigt sich für sein Fehlverhalten und möchte Sie dazu ermutigen, dem Server wieder beizutreten.\n\n'
+            body += f'Link: {SERVER_INVITE_LINK}\n\nMit freundlichen Grüßen\nIhr Bus nach Raisdorf\n'
+            mememail_send(smtp_host, sender, password, subject, body)
+        except Exception as e:
+            await message.replay(f'Konnte email nicht senden: {e}.')
     # get message
     message = context.message
     # special case
@@ -18,12 +34,16 @@ async def __cmd_ban_id(context: Context, user_id: int):
             # fetch nils
             nils = await message.guild.query_members(user_ids=[user_id])
             nils = nils[0]
+            # send email if u wish
+            if get_raisdorfuser_by_id(user_id).send_mail_on_kick:
+                await send_kickmail()
             # send dm if possible
             try:
                 await nils.create_dm()
                 await nils.dm_channel.send('https://discord.gg/ZdSQEFfcHw')
             except:
-                pass
+                if get_raisdorfuser_by_id(user_id).send_mail_on_kick == False: # jaja, not verwende ich jzt nicht mehr
+                    await send_kickmail()
             # kick
             reason = ' '.join(context.argv[1:])
             await nils.kick(reason=reason)

@@ -1,15 +1,15 @@
 from collections import namedtuple
 import discord
 
-RaisdorfUser = namedtuple("Raisdorfuser", "id name role isadmin")
+RaisdorfUser = namedtuple("Raisdorfuser", "id name role isadmin mail send_mail_on_kick")
 
 __USER_DATA: list[RaisdorfUser] = [
-    RaisdorfUser(224037892387766272, 'Nils', 'Gebannt', False),
-    RaisdorfUser(397130478907293707, 'Muha', 'Raisdorfbusenjoyer & ÖPNV-Connaisseur', False),
-    RaisdorfUser(373093304767873044, 'Finn', 'Q', True),
-    RaisdorfUser(696336485846220803, 'Emely', None, False),
-    RaisdorfUser(330701572118151169, 'Merlin', 'Q', True),
-    RaisdorfUser(1041448820258635906, 'Merlin2', 'Q', True)
+    RaisdorfUser(224037892387766272, 'Nils', 'Gebannt',                               False, 'stu235273@mail.uni-kiel.de', True),
+    RaisdorfUser(397130478907293707, 'Muha', 'Raisdorfbusenjoyer & ÖPNV-Connaisseur', False, 'stu235892@mail.uni-kiel.de', True),
+    RaisdorfUser(373093304767873044, 'Finn', 'Q',                                     True,  'stu236925@mail.uni-kiel.de', True),
+    RaisdorfUser(696336485846220803, 'Emely', None,                                   False, 'stu240369@mail.uni-kiel.de', True),
+    RaisdorfUser(330701572118151169, 'Merlin', 'Q',                                   True,  'stu235271@mail.uni-kiel.de', True),
+    RaisdorfUser(1041448820258635906, 'Merlin2', 'Q',                                 True,  'merliin3007@gmail.com', True)
 ]
 __USER_DATA_NAMEKEY: dict[str, RaisdorfUser] = { user.name : user for user in __USER_DATA }
 __USER_DATA_IDKEY: dict[int, RaisdorfUser] = { user.id : user for user in __USER_DATA }
@@ -69,12 +69,20 @@ class Settings:
         self.kunst_channel_ids: list[int] = [1051567423083532358, 1067251515066159224, 1052004758451392662]
         self.pizza = []
 
+        self.email_sender: str = 'example@example.com'
+        self.email_password: str = 'password'
+        self.email_smtp_host: str = 'smtp.example.com'
+
     def to_dict(self) -> dict:
         return {
             'admin_channel_id': self.admin_channel_id,
             'advert_channel_id': self.advert_channel_id,
             'broadcast_messages': self.broadcast_messages,
-            'pizza': self.pizza
+            'pizza': self.pizza,
+
+            'email_sender': self.email_sender,
+            'email_password': self.email_password,
+            'email_smtp_host': self.email_smtp_host
         }
 
     def from_dict(self, d: dict):
@@ -86,3 +94,9 @@ class Settings:
             self.broadcast_messages = d['broadcast_messages']
         if 'pizza' in d:
             self.pizza = d['pizza']
+        if 'email_sender' in d:
+            self.email_sender = d['email_sender']
+        if 'email_password' in d:
+            self.email_password = d['email_password']
+        if 'email_smtp_host' in d:
+            self.email_smtp_host = d['email_smtp_host']
