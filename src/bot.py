@@ -221,7 +221,7 @@ class DerBusNachRaisdorfClient(discord.Client):
                 await message.reply(
                     f'{user_get_name_from_id(REVILUM_ID)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
         elif 'xD' in message.content or 'XD' in message.content:
-            await message.reply('xD' + ''.join(
+            await message.channel.send('xD' + ''.join(
                 ['D' if random.randint(0, 1000) > 5 else ' rofl lulululul lul xD' for i in
                  range(random.randint(0, 50))]))
         elif 'pizza' in message.content.lower() and muha_safe_message[0] != '!':
