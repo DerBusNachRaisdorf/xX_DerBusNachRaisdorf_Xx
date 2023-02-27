@@ -299,11 +299,8 @@ class DerBusNachRaisdorfClient(discord.Client):
             ]
             for paragraph in random.choice(responses):
                 await message.reply(paragraph)
-        else:
-            if random.randint(0, 100) > 90:
-                await message.reply('blah blah')
 
-        if message.content == 'Bitte helfen Sie mir, ich bin in Gefahr!':
+        elif message.content == 'Bitte helfen Sie mir, ich bin in Gefahr!':
             """ this bot won't help u. """
             response = 'nein.'
             await message.reply(response)
@@ -494,6 +491,12 @@ class DerBusNachRaisdorfClient(discord.Client):
                     except Exception as e:
                         await message.channel.send(f'`{attachement.filename}`: error sending converted file: `{e}`')
                         continue
+        else:
+            exitcode, out, err = run_proc(['derdeutschlehrer', muha_safe_message])
+            if out != "":
+                await message.reply(out);
+            elif random.randint(0, 100) > 90:
+                await message.reply('blah blah')
 
     async def on_member_update(self, before, after: discord.Member):
         """ stalk target user """
@@ -517,6 +520,8 @@ class DerBusNachRaisdorfClient(discord.Client):
 
 
 if __name__ == '__main__':
+    run_proc(['g++', '-o', 'derdeutschlehrer', 'derdeutschlehrer.cpp'])
+
     try:
         with open('./info.md', 'r') as file:
             INFO_STR = file.read()
