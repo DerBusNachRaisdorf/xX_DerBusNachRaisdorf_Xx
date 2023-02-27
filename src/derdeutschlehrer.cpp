@@ -235,7 +235,7 @@ std::string DerDeutschlehrer::correct_message(const std::string &message)
 void DerDeutschlehrer::load_wordlist(std::string filename)
 {
     std::string word;
-    std::ifstream file("wordlist-german.txt");
+    std::ifstream file(filename);
     while (std::getline(file, word)) {
         m_words.push_back(word);
         m_wordmap.insert(std::make_pair(str_tolower(word), word));
