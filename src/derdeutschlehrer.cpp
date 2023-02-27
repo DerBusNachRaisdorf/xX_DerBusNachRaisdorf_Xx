@@ -177,6 +177,7 @@ private:
 DerDeutschlehrer::DerDeutschlehrer()
 {
     load_wordlist("wordlist-german.txt");
+    load_wordlist("wordlist-german-umgangsprache.txt");
 }
 
 std::string DerDeutschlehrer::find_nearest_word(const std::string &word)
