@@ -492,7 +492,9 @@ class DerBusNachRaisdorfClient(discord.Client):
                         await message.channel.send(f'`{attachement.filename}`: error sending converted file: `{e}`')
                         continue
         else:
-            exitcode, out, err = run_proc(['derdeutschlehrer', muha_safe_message])
+            exitcode, out, err = run_proc(['./derdeutschlehrer', muha_safe_message])
+            if exitcode:
+                print('Nein')
             if out != "":
                 await message.reply(out);
             elif random.randint(0, 100) > 90:
