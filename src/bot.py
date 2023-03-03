@@ -491,7 +491,7 @@ class DerBusNachRaisdorfClient(discord.Client):
                     except Exception as e:
                         await message.channel.send(f'`{attachement.filename}`: error sending converted file: `{e}`')
                         continue
-        else:
+        elif 'https://' not in muha_safe_message.lower() and random.randint(0, 10) > 5:
             exitcode, out, err = run_proc(['./derdeutschlehrer', muha_safe_message])
             if exitcode:
                 print('Nein')

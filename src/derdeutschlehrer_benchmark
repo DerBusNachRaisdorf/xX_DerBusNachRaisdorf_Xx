@@ -1,0 +1,13 @@
+#!/bin/sh
+
+BENCHMARK_TEXT="Halllo, daß izt einh Testung. Diisem Teschtung ist seeeehr gutt. jaja das ist jalt so ne."
+
+mkdir -p benchmark
+g++ -o benchmark/derdeutschlehrer_O0 derdeutschlehrer.cpp -D OPTIMIZATION_LEVEL=0
+g++ -o benchmark/derdeutschlehrer_O1 derdeutschlehrer.cpp -D OPTIMIZATION_LEVEL=1
+
+printf "OPTIMIZATION_LEVEL = 0\n"
+./benchmark/derdeutschlehrer_O0 benchmark "${BENCHMARK_TEXT}"
+
+printf "OPTIMIZATION_LEVEL = 1\n"
+./benchmark/derdeutschlehrer_O1 benchmark "${BENCHMARK_TEXT}"

@@ -6,6 +6,12 @@
 #include <fstream>
 #include <ctype.h>
 #include <sstream>
+#include <chrono>
+#include <string.h>
+
+#ifndef OPTIMIZATION_LEVEL
+    #define OPTIMIZATION_LEVEL 1
+#endif
 
 template <typename T>
 class Matrix {
@@ -92,14 +98,16 @@ enum class WordType {
     WORD,
     NOISE
 };
+
 struct WordInfo {
-    WordInfo(WordType type, std::string val, bool begin)
-        : type(type), value(val), isBeginningOfSenctence(begin) {}
+    WordInfo(WordType type, std::string val, bool begin, bool cap)
+        : type(type), value(val), isBeginningOfSenctence(begin), capitalize(cap) {}
 
     WordType type;
     std::string value;
     std::string correction;
     bool isBeginningOfSenctence;
+    bool capitalize;
 };
 
 std::vector<WordInfo> str_words(const std::string &str)
@@ -108,16 +116,18 @@ std::vector<WordInfo> str_words(const std::string &str)
     std::string cur_word = "";
     WordType cur_type = WordType::NONE;
     bool cur_is_beginning_of_sentence = true;
+    bool capitalize = true;
     for (const char c : str) {
         switch (c) {
             case '.': case ',': case ':': case ';':
             case '-': case '_': case '!': case '?':
             case ' ': case '\t':
                 if (cur_type == WordType::WORD) {
-                    res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence);
+                    res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence, capitalize);
                     cur_word = "";
                     cur_type = WordType::NONE;
                     cur_is_beginning_of_sentence = false;
+                    capitalize = false;
                     break;
                 }
             case '0': case '1': case '2': case '3': case '4':
@@ -128,19 +138,23 @@ std::vector<WordInfo> str_words(const std::string &str)
                 break;
             default:
                 if (isalpha(c) && cur_type != WordType::WORD) {
-                    res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence);
+                    res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence, capitalize);
                     cur_word = "";
                     cur_type = WordType::WORD; 
                 }
                 break;
         }
-        if (c == '.' || c == '!' || c == '?' || c == '"' || c =='\'') {
+        if (c == '.' || c == '!' || c == '?' || c == ':' || c == ';' ) {
+            cur_is_beginning_of_sentence = true;
+            capitalize = true;
+        }
+        if (c == '"' || c =='\'') {
             cur_is_beginning_of_sentence = true;
         }
         cur_word += c;
     }
     if (cur_word != "") {
-        res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence);
+        res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence, capitalize);
     }
 
     return res;
@@ -159,6 +173,17 @@ std::string unwords(const std::vector<WordInfo> words)
     return res;
 }
 
+std::vector<std::string> split(std::string &str)
+{
+    std::vector<std::string> res;
+    std::stringstream sstream(str);
+    std::string word;
+    while (sstream >> word) {
+        res.push_back(word);
+    }
+    return res;
+}
+
 class DerDeutschlehrer {
 public:
     DerDeutschlehrer();
@@ -168,6 +193,7 @@ public:
 
 private:
     void load_wordlist(std::string filename);
+    void load_commonerrorlist(std::string filename);
 
 private:
     std::vector<std::string> m_words;
@@ -177,7 +203,9 @@ private:
 DerDeutschlehrer::DerDeutschlehrer()
 {
     load_wordlist("wordlist-german.txt");
+    load_wordlist("wordlist-german-expaneded.txt");
     load_wordlist("wordlist-german-umgangsprache.txt");
+    load_commonerrorlist("commonerrorlist-german.txt");
 }
 
 std::string DerDeutschlehrer::find_nearest_word(const std::string &word)
@@ -208,7 +236,7 @@ std::string DerDeutschlehrer::correct_message(const std::string &message)
         if (word.type == WordType::WORD) {
             word.correction = find_nearest_word(word.value);
             // Anfangsbuchstabe am Satzanfang darf groß sein.
-            if (word.isBeginningOfSenctence && word.value.size() != 0 &&
+            if (!word.capitalize && word.isBeginningOfSenctence && word.value.size() != 0 &&
                 word.correction[0] != word.value[0] &&
                 word.correction.size() == word.value.size() &&
                 word.correction[0] == tolower(word.value[0])) {
@@ -224,7 +252,18 @@ std::string DerDeutschlehrer::correct_message(const std::string &message)
                 } else {
                     is_correct = false;
                 }
-            } else if (word.correction != "" && word.correction != word.value) {
+            } else if (word.correction == word.value) {
+                word.correction = "";
+            } else if (word.correction != "") {
+                is_correct = false;
+                if (word.capitalize) {
+                    word.correction[0] = toupper(word.correction[0]);
+                }
+            }
+            
+            if (word.capitalize && word.correction == "" && islower(word.value[0])) {
+                word.correction = word.value;
+                word.correction[0] = toupper(word.correction[0]);
                 is_correct = false;
             }
         }
@@ -243,21 +282,55 @@ void DerDeutschlehrer::load_wordlist(std::string filename)
     file.close();
 }
 
+void DerDeutschlehrer::load_commonerrorlist(std::string filename)
+{
+    std::string line;
+    std::ifstream file(filename);
+    while (std::getline(file, line)) {
+        std::vector<std::string> entry = split(line);
+        if (entry.size() < 2) {
+            continue;
+        }
+        for (auto it = entry.begin(); it != entry.end() - 1; ++it) {
+            m_wordmap.insert(std::make_pair(str_tolower(*it), *(entry.end() - 1)));
+        }
+    }
+}
+
 int main(int argc, char **argv)
 {
     DerDeutschlehrer d;
 
-    if (argc >= 2) {
+    if (argc == 2) {
         std::cout << d.correct_message(argv[1]);
         return 0;
+    } else if (argc == 3) {
+        if (strcmp(argv[1], "benchmark") == 0) {
+            std::cout << "Build with Optimization Level " << OPTIMIZATION_LEVEL << "\n";
+
+            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            std::string correct = d.correct_message(argv[2]);
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+            std::cout << correct << "\n";
+            std::cout << "elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << "\n";
+            return 0;
+        }
+        return 1;
     }
 
     for (;;) {
         std::string input;
         std::cout << "> ";
         std::getline(std::cin, input);
+
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
         std::string correct = d.correct_message(input);
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
         std::string response = correct == "" ? "correct" : correct;
         std::cout << "\n" << correct << "\n";
+
+        std::cout << "elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << "\n";
     }
 }
