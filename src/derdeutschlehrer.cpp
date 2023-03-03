@@ -383,7 +383,10 @@ public:
     inline size_t known_words() const { return m_words.size(); }
 
 private:
+    void add_word(std::string &word);
+
     void load_wordlist(std::string filename);
+    void load_text(std::string filename);
     void load_commonerrorlist(std::string filename);
 
 private:
@@ -393,12 +396,21 @@ private:
 
 DerDeutschlehrer::DerDeutschlehrer()
 {
-    load_wordlist("wordlist-german.txt");
-    load_wordlist("wordlist-german-expaneded.txt");
-    load_wordlist("wordlist-german-umgangsprache.txt");
-    load_wordlist("wordlist-german-anglizismen.txt");
-    load_wordlist("wordlist-german-insults.txt");
-    load_commonerrorlist("commonerrorlist-german.txt");
+    load_wordlist("wordlists/wordlist-german.txt");
+    load_wordlist("wordlists/wordlist-german-expaneded.txt");
+    load_wordlist("wordlists/wordlist-german-umgangsprache.txt");
+    load_wordlist("wordlists/wordlist-german-anglizismen.txt");
+    load_wordlist("wordlists/wordlist-german-insults.txt");
+    load_commonerrorlist("wordlists/commonerrorlist-german.txt");
+    load_text("wordlists/text-faust.txt");
+    load_text("wordlists/text-faust2.txt");
+    load_text("wordlists/text-faust3-chatgpt.txt");
+    load_text("wordlists/text-woyzeck.txt");
+    load_text("wordlists/text-die-bruecke-am-tay.txt");
+    load_text("wordlists/text-die-buergschaft.txt");
+    load_text("wordlists/text-linux.txt");
+    load_text("wordlists/text-kafka-das-urteil.txt");
+    load_text("wordlists/text-kafka-die-verwandlung.txt");
 }
 
 std::wstring DerDeutschlehrer::find_nearest_word(const std::wstring &w_word)
@@ -471,27 +483,51 @@ std::string DerDeutschlehrer::correct_message(const std::string &message)
     return is_correct ? "" : unwords(words);
 }
 
+void DerDeutschlehrer::add_word(std::string &word)
+{
+    std::string word_lower = str_tolower(word);
+
+    auto it = m_wordmap.find(word);
+    if (it != m_wordmap.end() && it->second == word) {
+        return;
+    }
+    it = m_wordmap.find(word_lower);
+    if (it != m_wordmap.end() && it->second == word) {
+        return;
+    }
+
+    m_words.push_back(word);
+    m_wordmap.insert(std::make_pair(word, word));
+    m_wordmap.insert(std::make_pair(word_lower, word));
+}
+
 void DerDeutschlehrer::load_wordlist(std::string filename)
 {
     std::string word;
     std::ifstream file(filename);
     while (std::getline(file, word)) {
-        std::string word_lower = str_tolower(word);
-
-        auto it = m_wordmap.find(word);
-        if (it != m_wordmap.end() && it->second == word) {
-            continue;
-        }
-        it = m_wordmap.find(word_lower);
-        if (it != m_wordmap.end() && it->second == word) {
-            continue;
-        }
-
-        m_words.push_back(word);
-        m_wordmap.insert(std::make_pair(word, word));
-        m_wordmap.insert(std::make_pair(word_lower, word));
+        add_word(word);
     }
     file.close();
+}
+
+void DerDeutschlehrer::load_text(std::string filename)
+{
+    std::string line;
+    std::ifstream file(filename);
+    while (std::getline(file, line)) {
+        std::wstring wline = str_to_wstr(line);
+        std::wstring wword = L"";
+        for (const wchar_t c : wline) {
+            if (m_iswletter(c)) {
+                wword += c;
+            } else {
+                std::string word = wstr_to_str(wword);
+                add_word(word);
+                wword = L"";
+            }
+        }
+    }
 }
 
 void DerDeutschlehrer::load_commonerrorlist(std::string filename)
