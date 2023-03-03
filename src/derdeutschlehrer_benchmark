@@ -3,11 +3,11 @@
 BENCHMARK_TEXT="Halllo, daß izt einh Testung. Diisem Teschtung ist seeeehr gutt. jaja das ist jalt so ne."
 
 mkdir -p benchmark
-g++ -o benchmark/derdeutschlehrer_O0 derdeutschlehrer.cpp -D OPTIMIZATION_LEVEL=0
-g++ -o benchmark/derdeutschlehrer_O1 derdeutschlehrer.cpp -D OPTIMIZATION_LEVEL=1
+g++ -o benchmark/derdeutschlehrer_O0 derdeutschlehrer.cpp -D USE_ADVANCED_EDIT_DISTANCE=0
+g++ -o benchmark/derdeutschlehrer_O1 derdeutschlehrer.cpp -D USE_ADVANCED_EDIT_DISTANCE=1
 
-printf "OPTIMIZATION_LEVEL = 0\n"
+printf "ADVANCED OFF\n"
 ./benchmark/derdeutschlehrer_O0 benchmark "${BENCHMARK_TEXT}"
 
-printf "OPTIMIZATION_LEVEL = 1\n"
+printf "ADVANCED ON\n"
 ./benchmark/derdeutschlehrer_O1 benchmark "${BENCHMARK_TEXT}"

@@ -1,19 +1,3 @@
-/**
- * @file derdeutschlehrer.cpp
- * @author your name (you@domain.com)
- * @brief 
- * @version 0.1
- * @date 2023-03-03
- * 
- * @copyright Copyright (c) 2023
- * 
- * **Changelog**
- * 03.03.2023: 
- *  - kennt jzt Anglizismen
- *  - unterstützt jzt Umlaute, dafür aber deutlich langsamer lul
- */
-
-
 #include <limits.h>
 #include <string>
 #include <vector>
@@ -24,102 +8,15 @@
 #include <sstream>
 #include <chrono>
 #include <string.h>
-#include <locale>
-#include <codecvt>
+
 #include <unistd.h>
 #include <dlfcn.h>
 
-#ifndef     OPTIMIZATION_LEVEL
+#ifndef OPTIMIZATION_LEVEL
     #define OPTIMIZATION_LEVEL 1
 #endif
 
-#ifndef     USE_ADVANCED_EDIT_DISTANCE
-    #define USE_ADVANCED_EDIT_DISTANCE true
-#endif
-
-std::wstring str_to_wstr(const std::string &str)
-{
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring wide = converter.from_bytes(str);
-    return wide;
-}
-
-std::wstring cstr_to_wstr(const char *str)
-{
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::wstring wide = converter.from_bytes(str);
-    return wide;
-}
-
-std::string wstr_to_str(const std::wstring &str)
-{
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::string narrow = converter.to_bytes(str);
-    return narrow;
-}
-
-bool m_iswletter(const wchar_t c)
-{
-    switch (c) {
-        case L'Ü': case L'ü': case L'Ä': case L'ä':
-        case L'Ö': case L'ö': case L'ß':
-            return true;
-        default:
-            return iswalpha(c);
-    }
-}
-
-bool m_iswlower(const wchar_t c)
-{
-    switch (c) {
-        case L'ü': case L'ä': case L'ö': case L'ß':
-            return true;
-        default:
-            return iswlower(c);
-    }
-}
-
-bool m_iswupper(const wchar_t c)
-{
-    switch (c) {
-        case L'Ü': case L'Ä': case L'Ö':
-            return true;
-        default:
-            return iswupper(c);
-    }
-}
-
-wchar_t m_towlower(const wchar_t c)
-{
-    switch (c) {
-        case L'Ü': case L'ü':
-            return L'ü';
-        case L'Ä': case L'ä':
-            return L'ä';
-        case L'Ö': case L'ö':
-            return L'ö';
-        case L'ß':
-            return L'ß';
-        default:
-            return towlower(c);
-    }
-}
-
-wchar_t m_towupper(const wchar_t c)
-{
-    switch (c) {
-        case L'Ü': case L'ü':
-            return L'Ü';
-        case L'Ä': case L'ä':
-            return L'Ä';
-        case L'Ö': case L'ö':
-            return L'Ö';
-        case L'ß':
-            return L'ß';
-        default:
-            return towupper(c);
-    }
-}
+#define USE_ADVANCED_EDIT_DISTANCE true
 
 template <typename T>
 class Matrix {
@@ -164,63 +61,7 @@ T min3(T a, T b, T c)
     return ab < c ? ab : c;
 }
 
-template <typename T>
-T min2(T a, T b)
-{
-    return a < b ? a : b;
-}
-
-int wchar_distance_h(const wchar_t c1, const wchar_t c2)
-{
-    wchar_t c1_lower = m_towlower(c1), c2_lower = m_towlower(c2);
-    int dist = 5;
-    switch (c1_lower) {
-        case L'u':
-            if (c2_lower == L'ü') {
-                dist = min2(dist, 2);
-            }
-            break;
-        case L'o':
-            if (c2_lower == L'ö') {
-                dist = min2(dist, 2);
-            }
-            break;
-        case L'a':
-            if (c2_lower == L'ä') {
-                dist = min2(dist, 2);
-            }
-            break;
-        case L's':
-            if (c2_lower == L'ß') {
-                dist = min2(dist, 2);
-            }
-            break;
-        case L'e':
-            if (c2_lower == L'é') {
-                dist = min2(dist, 2);
-            }
-            break;
-    }
-
-    if (m_iswlower(c1) != m_iswlower(c2)) {
-        dist += 1;
-    }
-
-    return dist;
-}
-
-int wchar_distance(const wchar_t c1, const wchar_t c2)
-{
-    if (c1 == c2) {
-        return 0;
-    } else if (m_towlower(c1) == m_towlower(c2)) {
-        return 1;
-    }
-
-    return min2(wchar_distance_h(c1, c2), wchar_distance_h(c2, c1));
-}
-
-int edit_distance(const std::wstring &word1, const std::wstring &word2)
+int edit_distance(const std::string &word1, const std::string &word2)
 {
     size_t word1_len = word1.size();
     size_t word2_len = word2.size();
@@ -237,20 +78,11 @@ int edit_distance(const std::wstring &word1, const std::wstring &word2)
     for (ssize_t i = word1_len - 1; i >= 0; --i) {
         for (ssize_t j = word2_len - 1; j >= 0; --j) {
 #if USE_ADVANCED_EDIT_DISTANCE
-/*
             if (word1[i] == word2[j]) {
                 cache.at(i, j) = cache.at(i+1, j+1);
-            } else {
-                cache.at(i, j) = wchar_distance(word1[i], word2[j]) + min3(
+            } else if (tolower(word1[i]) == tolower(word2[j])) {
+                cache.at(i, j) = 1 + min3(
                     cache.at(i+1, j), cache.at(i, j+1), cache.at(i+1, j+1));
-            }
-*/
-            if (word1[i] == word2[j]) {
-                cache.at(i, j) = cache.at(i+1, j+1);
-            } else if (m_towlower(word1[i]) == m_towlower(word2[j])) {
-                cache.at(i, j) = 1 + cache.at(i+1, j+1);
-                //cache.at(i, j) = 1 + min3(
-                //    cache.at(i+1, j), cache.at(i, j+1), cache.at(i+1, j+1));
             } else {
                 cache.at(i, j) = 2 + min3(
                     cache.at(i+1, j), cache.at(i, j+1), cache.at(i+1, j+1));
@@ -269,15 +101,13 @@ int edit_distance(const std::wstring &word1, const std::wstring &word2)
     return cache.at(0, 0);
 }
 
-
 std::string str_tolower(const std::string &str)
 {
-    std::wstring wstr = str_to_wstr(str);
-    std::wstring wres = L"";
-    for (const wchar_t c : wstr) {
-        wres += m_towlower(c);
+    std::string res = "";
+    for (const char c : str) {
+        res += tolower(c);
     }
-    return wstr_to_str(wres);
+    return res;
 }
 
 enum class WordType {
@@ -287,33 +117,31 @@ enum class WordType {
 };
 
 struct WordInfo {
-    WordInfo(WordType type, std::wstring val, bool begin, bool cap)
+    WordInfo(WordType type, std::string val, bool begin, bool cap)
         : type(type), value(val), isBeginningOfSenctence(begin), capitalize(cap) {}
 
     WordType type;
-    std::wstring value;
-    std::wstring correction;
+    std::string value;
+    std::string correction;
     bool isBeginningOfSenctence;
     bool capitalize;
 };
 
 std::vector<WordInfo> str_words(const std::string &str)
 {
-    std::wstring wstr = str_to_wstr(str);
-
     std::vector<WordInfo> res;
-    std::wstring cur_word = L"";
+    std::string cur_word = "";
     WordType cur_type = WordType::NONE;
     bool cur_is_beginning_of_sentence = true;
     bool capitalize = true;
-    for (const wchar_t c : wstr) {
+    for (const char c : str) {
         switch (c) {
             case '.': case ',': case ':': case ';':
             case '-': case '_': case '!': case '?':
             case ' ': case '\t':
                 if (cur_type == WordType::WORD) {
                     res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence, capitalize);
-                    cur_word = L"";
+                    cur_word = "";
                     cur_type = WordType::NONE;
                     cur_is_beginning_of_sentence = false;
                     capitalize = false;
@@ -326,9 +154,9 @@ std::vector<WordInfo> str_words(const std::string &str)
                 }
                 break;
             default:
-                if (m_iswletter(c) && cur_type != WordType::WORD) {
+                if (isalpha(c) && cur_type != WordType::WORD) {
                     res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence, capitalize);
-                    cur_word = L"";
+                    cur_word = "";
                     cur_type = WordType::WORD; 
                 }
                 break;
@@ -342,7 +170,7 @@ std::vector<WordInfo> str_words(const std::string &str)
         }
         cur_word += c;
     }
-    if (cur_word != L"") {
+    if (cur_word != "") {
         res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence, capitalize);
     }
 
@@ -353,10 +181,10 @@ std::string unwords(const std::vector<WordInfo> words)
 {
     std::string res = "";
     for (const WordInfo &word : words) {
-        if (word.correction == L"" || word.value == word.correction) {
-            res += wstr_to_str(word.value);
+        if (word.correction == "" || word.value == word.correction) {
+            res += word.value;
         } else {
-            res += "(~~" + wstr_to_str(word.value) + "~~) " + wstr_to_str(word.correction);
+            res += "(~~" + word.value + "~~) " + word.correction;
         }
     }
     return res;
@@ -377,7 +205,7 @@ class DerDeutschlehrer {
 public:
     DerDeutschlehrer();
 
-    std::wstring find_nearest_word(const std::wstring &word);
+    std::string find_nearest_word(const std::string &word);
     std::string correct_message(const std::string &message);
 
 private:
@@ -398,27 +226,24 @@ DerDeutschlehrer::DerDeutschlehrer()
     load_commonerrorlist("commonerrorlist-german.txt");
 }
 
-std::wstring DerDeutschlehrer::find_nearest_word(const std::wstring &w_word)
+std::string DerDeutschlehrer::find_nearest_word(const std::string &word)
 {
-    std::string word = wstr_to_str(w_word);
-
     auto it = m_wordmap.find(word);
     if (it != m_wordmap.end()) {
-        return str_to_wstr(it->second);
+        return it->second;
     }
     it = m_wordmap.find(str_tolower(word));
     if (it != m_wordmap.end()) {
-        return str_to_wstr(it->second);
+        return it->second;
     }
 
     int nearest_distance = INT_MAX;
-    std::wstring nearest_word = L"Schnellgüterwagen";
+    std::string nearest_word = "Schnellgüterwagen";
     for (const std::string &cur_word : m_words) {
-        std::wstring w_cur_word = str_to_wstr(cur_word);
-        int cur_distance = edit_distance(w_word, w_cur_word);
+        int cur_distance = edit_distance(word, cur_word);
         if (cur_distance < nearest_distance) {
             nearest_distance = cur_distance;
-            nearest_word = w_cur_word;
+            nearest_word = cur_word;
         }
     }
 
@@ -436,7 +261,7 @@ std::string DerDeutschlehrer::correct_message(const std::string &message)
             if (!word.capitalize && word.isBeginningOfSenctence && word.value.size() != 0 &&
                 word.correction[0] != word.value[0] &&
                 word.correction.size() == word.value.size() &&
-                word.correction[0] == m_towlower(word.value[0])) {
+                word.correction[0] == tolower(word.value[0])) {
                 bool isValid = true;
                 for (size_t i = 1; i < word.value.size(); ++i) {
                     if (word.correction[i] != word.value[i]) {
@@ -445,22 +270,22 @@ std::string DerDeutschlehrer::correct_message(const std::string &message)
                     }
                 }
                 if (isValid) {
-                    word.correction = L"";
+                    word.correction = "";
                 } else {
                     is_correct = false;
                 }
             } else if (word.correction == word.value) {
-                word.correction = L"";
-            } else if (word.correction != L"") {
+                word.correction = "";
+            } else if (word.correction != "") {
                 is_correct = false;
                 if (word.capitalize) {
-                    word.correction[0] = m_towupper(word.correction[0]);
+                    word.correction[0] = toupper(word.correction[0]);
                 }
             }
             
-            if (word.capitalize && word.correction == L"" && m_iswlower(word.value[0])) {
+            if (word.capitalize && word.correction == "" && islower(word.value[0])) {
                 word.correction = word.value;
-                word.correction[0] = m_towupper(word.correction[0]);
+                word.correction[0] = toupper(word.correction[0]);
                 is_correct = false;
             }
         }
@@ -515,7 +340,7 @@ int main(int argc, char **argv)
         return 0;
     } else if (argc == 3) {
         if (strcmp(argv[1], "benchmark") == 0) {
-            std::cout << "Build with" << (USE_ADVANCED_EDIT_DISTANCE ? "" : "out") << " Advanced Edit Distance " << "\n";
+            std::cout << "Build with Optimization Level " << OPTIMIZATION_LEVEL << "\n";
 
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
             std::string correct = d.correct_message(argv[2]);
