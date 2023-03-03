@@ -380,6 +380,8 @@ public:
     std::wstring find_nearest_word(const std::wstring &word);
     std::string correct_message(const std::string &message);
 
+    inline size_t known_words() const { return m_words.size(); }
+
 private:
     void load_wordlist(std::string filename);
     void load_commonerrorlist(std::string filename);
@@ -395,6 +397,7 @@ DerDeutschlehrer::DerDeutschlehrer()
     load_wordlist("wordlist-german-expaneded.txt");
     load_wordlist("wordlist-german-umgangsprache.txt");
     load_wordlist("wordlist-german-anglizismen.txt");
+    load_wordlist("wordlist-german-insults.txt");
     load_commonerrorlist("commonerrorlist-german.txt");
 }
 
@@ -527,6 +530,8 @@ int main(int argc, char **argv)
         }
         return 1;
     }
+
+    std::cout << "Isch kenne momentan " << d.known_words() << " Wörtahs." << std::endl;
 
     for (;;) {
         std::string input;
