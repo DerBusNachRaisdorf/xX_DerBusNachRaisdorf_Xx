@@ -500,14 +500,14 @@ class DerBusNachRaisdorfClient(discord.Client):
                 if err != "":
                     numbers = list(map(int, err.split('/')))
                     if len(numbers) == 2:
-                        words: int = numbers[0]
-                        errors: int = numbers[1]
+                        errors: int = numbers[0]
+                        words: int = numbers[1]
                         userid = message.author.id
                         if userid in self.settings.fehlerqouten:
-                            self.settings.fehlerqouten[userid][0] += words
-                            self.settings.fehlerqouten[userid][1] += errors
+                            self.settings.fehlerqouten[userid][0] += errors
+                            self.settings.fehlerqouten[userid][1] += words
                         else:
-                            self.settings.fehlerqouten[userid] = [words, errors]
+                            self.settings.fehlerqouten[userid] = [errors, words]
                         self.save_settings()
             elif random.randint(0, 100) > 90:
                 await message.reply('blah blah')

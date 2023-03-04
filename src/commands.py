@@ -90,8 +90,8 @@ async def __cmd_rechtschreibfehler(ctx: Context):
     for id, data in ctx.settings.fehlerqouten.items():
         data: list[int] = data
         name: str = get_raisdorfuser_by_id(id).name
-        words: int = data[0]
-        errors: int = data[1]
+        errors: int = data[0]
+        words: int = data[1]
         await ctx.message.reply(f'***{name}***: **{(errors/words) * 100.0}% falsch** ({errors}/{words})')
 
 

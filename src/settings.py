@@ -73,7 +73,7 @@ class Settings:
         self.email_password: str = 'password'
         self.email_smtp_host: str = 'smtp.example.com'
 
-        # { id : (words, errors) }
+        # { id : (errors, words) }
         self.fehlerqouten: dict[int, list[int, int]] = {}
 
     def to_dict(self) -> dict:
