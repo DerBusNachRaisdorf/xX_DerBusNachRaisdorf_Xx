@@ -130,6 +130,9 @@ async def call_if_command(context: Context) -> bool:
     if command_mapping[command].admins_only:
         await context.message.reply('Finger weg!')
     else:
-        await command_mapping[command].callable(context)
+        try:
+            await command_mapping[command].callable(context)
+        except Exception as e:
+            await context.message.reply(f'Fehler: {e}')
     # return successful execution
     return True
