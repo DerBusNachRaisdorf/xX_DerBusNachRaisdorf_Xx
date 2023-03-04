@@ -415,7 +415,7 @@ public:
 #endif
 
 private:
-    void add_word(std::string &word);
+    void add_word(std::string &word, bool only_add_if_lowercase_does_not_already_exit=false);
 
     void load_wordlist(std::string filename);
     void load_text(std::string filename, std::string author);
@@ -550,7 +550,7 @@ CorrectionResult DerDeutschlehrer::correct_message(const std::string &message)
 
 }
 
-void DerDeutschlehrer::add_word(std::string &word)
+void DerDeutschlehrer::add_word(std::string &word, bool only_add_if_lowercase_does_not_already_exist)
 {
     std::string word_lower = str_tolower(word);
 
@@ -559,7 +559,7 @@ void DerDeutschlehrer::add_word(std::string &word)
         return;
     }
     it = m_wordmap.find(word_lower);
-    if (it != m_wordmap.end() && it->second == word) {
+    if (it != m_wordmap.end() && (it->second == word || only_add_if_lowercase_does_not_already_exist)) {
         return;
     }
 
@@ -613,7 +613,7 @@ void DerDeutschlehrer::load_text(std::string filename, std::string author)
                 wword += c;
             } else {
                 std::string word = wstr_to_str(wword);
-                add_word(word);
+                add_word(word, true);
                 wword = L"";
 
 #if ENABLE_RANDOM_CITES
