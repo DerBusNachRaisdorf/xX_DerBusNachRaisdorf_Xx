@@ -498,7 +498,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             if out != "":
                 await message.reply(out);
                 if err != "":
-                    numbers = map(int, err.split('/'))
+                    numbers = list(map(int, err.split('/')))
                     if len(numbers) == 2:
                         words: int = numbers[0]
                         errors: int = numbers[1]
