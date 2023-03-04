@@ -37,6 +37,14 @@
     #define USE_ADVANCED_EDIT_DISTANCE true
 #endif
 
+#ifndef     ENABLE_RANDOM_CITES
+    #define ENABLE_RANDOM_CITES true
+#endif
+
+#ifndef     MIN_CITATION_TRIGGERWORD_LENGTH
+    #define MIN_CITATION_TRIGGERWORD_LENGTH 10
+#endif
+
 std::wstring str_to_wstr(const std::string &str)
 {
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
@@ -310,7 +318,7 @@ std::vector<WordInfo> str_words(const std::string &str)
         switch (c) {
             case '.': case ',': case ':': case ';':
             case '-': case '_': case '!': case '?':
-            case ' ': case '\t':
+            case ' ': case '\t': case '\'':
                 if (cur_type == WordType::WORD) {
                     res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence, capitalize);
                     cur_word = L"";
@@ -373,25 +381,53 @@ std::vector<std::string> split(std::string &str)
     return res;
 }
 
+#if ENABLE_RANDOM_CITES
+    class EinZitat {
+    public:
+        EinZitat(std::string zitat="Bruda, was los?", std::string autor="Keyboard-Cat")
+            : autor(autor), zitat(zitat) {}
+        std::string autor, zitat;
+
+        std::string to_string() { return "Um es mit den Worten von " + autor + " zu sagen: \n" + zitat; }
+    };
+#endif /* ENABLE_RANDOM_CITES */
+
+struct CorrectionResult {
+    CorrectionResult(std::string response, size_t words, size_t errors)
+        : response(response), words(words), errors(errors) {}
+
+    std::string response;
+    size_t words;
+    size_t errors;
+};
+
 class DerDeutschlehrer {
 public:
     DerDeutschlehrer();
 
     std::wstring find_nearest_word(const std::wstring &word);
-    std::string correct_message(const std::string &message);
+    CorrectionResult correct_message(const std::string &message);
 
     inline size_t known_words() const { return m_words.size(); }
+
+#if ENABLE_RANDOM_CITES
+    inline size_t known_citations() const { return m_cite_map.size(); }
+#endif
 
 private:
     void add_word(std::string &word);
 
     void load_wordlist(std::string filename);
-    void load_text(std::string filename);
+    void load_text(std::string filename, std::string author);
     void load_commonerrorlist(std::string filename);
 
 private:
     std::vector<std::string> m_words;
     std::unordered_map<std::string, std::string> m_wordmap;
+
+#if ENABLE_RANDOM_CITES
+    std::unordered_map<std::string, EinZitat> m_cite_map;
+#endif
 };
 
 DerDeutschlehrer::DerDeutschlehrer()
@@ -402,15 +438,16 @@ DerDeutschlehrer::DerDeutschlehrer()
     load_wordlist("wordlists/wordlist-german-anglizismen.txt");
     load_wordlist("wordlists/wordlist-german-insults.txt");
     load_commonerrorlist("wordlists/commonerrorlist-german.txt");
-    load_text("wordlists/text-faust.txt");
-    load_text("wordlists/text-faust2.txt");
-    load_text("wordlists/text-faust3-chatgpt.txt");
-    load_text("wordlists/text-woyzeck.txt");
-    load_text("wordlists/text-die-bruecke-am-tay.txt");
-    load_text("wordlists/text-die-buergschaft.txt");
-    load_text("wordlists/text-linux.txt");
-    load_text("wordlists/text-kafka-das-urteil.txt");
-    load_text("wordlists/text-kafka-die-verwandlung.txt");
+    load_text("wordlists/text-faust.txt", "Goethe");
+    load_text("wordlists/text-faust2.txt", "Goethe");
+    load_text("wordlists/text-faust3-chatgpt.txt", "Chat-GPT");
+    load_text("wordlists/text-prometheus.txt", "Goethe");
+    load_text("wordlists/text-woyzeck.txt", "Georg Büchner");
+    load_text("wordlists/text-die-bruecke-am-tay.txt", "Theodor Fontane oder so");
+    load_text("wordlists/text-die-buergschaft.txt", "Schiller aus der Schilleria");
+    load_text("wordlists/text-linux.txt", "Richard Stallman");
+    load_text("wordlists/text-kafka-das-urteil.txt", "Kafka");
+    load_text("wordlists/text-kafka-die-verwandlung.txt", "Kafka");
 }
 
 std::wstring DerDeutschlehrer::find_nearest_word(const std::wstring &w_word)
@@ -440,13 +477,29 @@ std::wstring DerDeutschlehrer::find_nearest_word(const std::wstring &w_word)
     return nearest_word;
 }
 
-std::string DerDeutschlehrer::correct_message(const std::string &message)
+CorrectionResult DerDeutschlehrer::correct_message(const std::string &message)
 {
     std::vector<WordInfo> words = str_words(message);
+    size_t num_words = 0, num_errors = 0;
+
+#if ENABLE_RANDOM_CITES
+    std::string longest_cite_word = "";
+#endif /* ENABLE_RANDOM_CITES */
+
     bool is_correct = true;
     for (WordInfo &word : words) {
         if (word.type == WordType::WORD) {
+            num_words++;
+
             word.correction = find_nearest_word(word.value);
+
+#if ENABLE_RANDOM_CITES
+            std::string maybe_cite_word = wstr_to_str(word.correction);
+            if (word.correction.size() > longest_cite_word.size() && m_cite_map.find(maybe_cite_word) != m_cite_map.end()) {
+                longest_cite_word = maybe_cite_word;
+            }
+#endif /* ENABLE_RANDOM_CITES */
+
             // Anfangsbuchstabe am Satzanfang darf groß sein.
             if (!word.capitalize && word.isBeginningOfSenctence && word.value.size() != 0 &&
                 word.correction[0] != word.value[0] &&
@@ -478,9 +531,23 @@ std::string DerDeutschlehrer::correct_message(const std::string &message)
                 word.correction[0] = m_towupper(word.correction[0]);
                 is_correct = false;
             }
+
+            if (word.correction != L"" && word.correction != word.value) {
+                num_errors++;
+            }
         }
     }
-    return is_correct ? "" : unwords(words);
+
+    std::string response_message = is_correct ? "" : unwords(words);
+
+#if ENABLE_RANDOM_CITES
+    if (longest_cite_word.size() >= 5) {
+        response_message = (is_correct ? "" : unwords(words) + "\n\nJedoch... ") + m_cite_map[longest_cite_word].to_string();
+    }
+#endif /* ENABLE_RANDOM_CITES */
+
+    return CorrectionResult(response_message, num_words, num_errors);
+
 }
 
 void DerDeutschlehrer::add_word(std::string &word)
@@ -511,20 +578,49 @@ void DerDeutschlehrer::load_wordlist(std::string filename)
     file.close();
 }
 
-void DerDeutschlehrer::load_text(std::string filename)
+void DerDeutschlehrer::load_text(std::string filename, std::string author)
 {
     std::string line;
     std::ifstream file(filename);
+
+#if ENABLE_RANDOM_CITES
+    std::string cur_paragraph = "";
+    std::string cur_paragraph_longest_word = "";
+#endif
+
     while (std::getline(file, line)) {
+
+#if ENABLE_RANDOM_CITES
+        if (line == "" || line == "\r") {
+            if (cur_paragraph_longest_word.size() >= MIN_CITATION_TRIGGERWORD_LENGTH) {
+                EinZitat zitat(cur_paragraph, author);
+                m_cite_map.insert(std::make_pair(cur_paragraph_longest_word, zitat));
+            }
+
+            cur_paragraph = "";
+            cur_paragraph_longest_word = "";
+        } else {
+            cur_paragraph += "> " + line + "\n";
+        }
+#endif /* ENABLE_RANDOM_CITES */
+
+        /* process words */
         std::wstring wline = str_to_wstr(line);
         std::wstring wword = L"";
-        for (const wchar_t c : wline) {
+        for (size_t i = 0; i < wline.size() + 1; ++i) {
+            wchar_t c = wline[i];
             if (m_iswletter(c)) {
                 wword += c;
             } else {
                 std::string word = wstr_to_str(wword);
                 add_word(word);
                 wword = L"";
+
+#if ENABLE_RANDOM_CITES
+                if (word.size() > cur_paragraph_longest_word.size() && m_cite_map.find(word) == m_cite_map.end()) {
+                    cur_paragraph_longest_word = word;
+                }
+#endif /* ENABLE_RANDOM_CITES */
             }
         }
     }
@@ -550,17 +646,20 @@ int main(int argc, char **argv)
     DerDeutschlehrer d;
 
     if (argc == 2) {
-        std::cout << d.correct_message(argv[1]);
+        CorrectionResult result = d.correct_message(argv[1]);
+        std::cout << result.response;
+        std::cerr << result.errors << "/" << result.words;
         return 0;
     } else if (argc == 3) {
         if (strcmp(argv[1], "benchmark") == 0) {
             std::cout << "Build with" << (USE_ADVANCED_EDIT_DISTANCE ? "" : "out") << " Advanced Edit Distance " << "\n";
 
             std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-            std::string correct = d.correct_message(argv[2]);
+            CorrectionResult result = d.correct_message(argv[2]);
             std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-            std::cout << correct << "\n";
+            std::cout << result.response << "\n";
+            std::cerr << result.errors << "/" << result.words << "\n";
             std::cout << "elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << "\n";
             return 0;
         }
@@ -569,17 +668,21 @@ int main(int argc, char **argv)
 
     std::cout << "Isch kenne momentan " << d.known_words() << " Wörtahs." << std::endl;
 
+#if ENABLE_RANDOM_CITES
+    std::cout << "Isch kenne momentan " << d.known_citations() << " Zitate." << std::endl;
+#endif
+
     for (;;) {
         std::string input;
         std::cout << "> ";
         std::getline(std::cin, input);
 
         std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-        std::string correct = d.correct_message(input);
+        CorrectionResult result = d.correct_message(input);
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-        std::string response = correct == "" ? "correct" : correct;
-        std::cout << "\n" << correct << "\n";
+        std::cout << "\n" << result.response << "\n";
+        std::cerr << result.errors << "/" << result.words << "\n";
 
         std::cout << "elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << "\n";
     }

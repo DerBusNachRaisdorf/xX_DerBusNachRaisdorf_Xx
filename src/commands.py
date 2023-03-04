@@ -2,9 +2,13 @@ import random
 
 from settings import *
 from context import Context
+from collections import namedtuple
 from utility.mememail import mememail_send
 
 SERVER_INVITE_LINK: str = 'https://discord.gg/ZdSQEFfcHw'
+
+
+RaisdorfCommand = namedtuple("RaisdorfCommand", "callable admins_only")
 
 
 async def __cmd_ban_id(context: Context, user_id: int):
@@ -82,16 +86,35 @@ async def __cmd_get_raisdorfuser_by_name(ctx: Context):
         await ctx.message.reply(response)
 
 
-command_mapping: dict[str: callable(Context)] = {
+async def __cmd_rechtschreibfehler(ctx: Context):
+    for id, data in ctx.settings.fehlerqouten.items():
+        data: list[int] = data
+        name: str = get_raisdorfuser_by_id(id).name
+        words: int = data[0]
+        errors: int = data[1]
+        await ctx.message.reply(f'***{name}***: **{(errors/words) * 100.0}% falsch** ({errors}/{words})')
+
+
+async def __cmd_reset_rechtschreibfehler(ctx: Context):
+    ctx.settings.fehlerqouten = {}
+    await ctx.message.reply('done.')
+
+
+
+#command_mapping: dict[str: callable(Context)] = {
+command_mapping: dict[str: RaisdorfCommand] = {
     # bann commands
-    "nils"  : lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Nils").id),
-    "muha"  : lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Muha").id),
-    "emely" : lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Emely").id),
-    "finn"  : lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Finn").id),
-    "merlin": lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Merlin").id),
-    "merlin2": lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Merlin2").id),
+    "nils"  :   RaisdorfCommand(lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Nils").id), False),
+    "muha"  :   RaisdorfCommand(lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Muha").id), False),
+    "emely" :   RaisdorfCommand(lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Emely").id), False),
+    "finn"  :   RaisdorfCommand(lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Finn").id), False),
+    "merlin":   RaisdorfCommand(lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Merlin").id), False),
+    "merlin2":  RaisdorfCommand(lambda c: __cmd_ban_id(c, get_raisdorfuser_by_name("Merlin2").id), False),
+    # DerDeutschlehrer
+    "rechtschreibfehler" : RaisdorfCommand(__cmd_rechtschreibfehler, False),
+    "reset_rechtschreibfehler" : RaisdorfCommand(__cmd_reset_rechtschreibfehler, True),
     # utility commands
-    "get_raisdorfuser_by_name" : __cmd_get_raisdorfuser_by_name
+    "get_raisdorfuser_by_name" : RaisdorfCommand(__cmd_get_raisdorfuser_by_name, False)
 }
 
 
@@ -104,6 +127,9 @@ async def call_if_command(context: Context) -> bool:
     if command not in commands:
         return False
     # execute method
-    await command_mapping[command](context)
+    if command_mapping[command].admins_only:
+        await context.message.reply('Finger weg!')
+    else:
+        await command_mapping[command].callable(context)
     # return successful execution
     return True

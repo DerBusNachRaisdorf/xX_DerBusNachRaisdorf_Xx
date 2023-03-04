@@ -73,6 +73,9 @@ class Settings:
         self.email_password: str = 'password'
         self.email_smtp_host: str = 'smtp.example.com'
 
+        # { id : (words, errors) }
+        self.fehlerqouten: dict[int, list[int, int]] = {}
+
     def to_dict(self) -> dict:
         return {
             'admin_channel_id': self.admin_channel_id,

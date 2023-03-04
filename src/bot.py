@@ -208,7 +208,6 @@ class DerBusNachRaisdorfClient(discord.Client):
         if await commands.call_if_command(context):
             return
 
-        # old handling
         if '?nils pizza' in message.content.lower():
             if REVILUM_ID not in self.settings.pizza:
                 self.settings.pizza.append(REVILUM_ID)
@@ -300,6 +299,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             for paragraph in random.choice(responses):
                 await message.reply(paragraph)
 
+        # old command handling
         elif message.content == 'Bitte helfen Sie mir, ich bin in Gefahr!':
             """ this bot won't help u. """
             response = 'nein.'
@@ -497,6 +497,18 @@ class DerBusNachRaisdorfClient(discord.Client):
                 print('Nein')
             if out != "":
                 await message.reply(out);
+                if err != "":
+                    numbers = map(int, err.split('/'))
+                    if len(numbers) == 2:
+                        words: int = numbers[0]
+                        errors: int = numbers[1]
+                        userid = message.author.id
+                        if userid in self.settings.fehlerqouten:
+                            self.settings.fehlerqouten[userid][0] += words
+                            self.settings.fehlerqouten[userid][1] += errors
+                        else:
+                            self.settings.fehlerqouten[userid] = [words, errors]
+                        self.save_settings()
             elif random.randint(0, 100) > 90:
                 await message.reply('blah blah')
 
