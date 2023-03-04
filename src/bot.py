@@ -206,6 +206,7 @@ class DerBusNachRaisdorfClient(discord.Client):
 
         # better command handling
         if await commands.call_if_command(context):
+            self.save_settings() # falls der comand was verändert hat lul, in Zukunft soll der command selber speicher, kann er gerade aber noch nicht :/ sad
             return
 
         if '?nils pizza' in message.content.lower():
