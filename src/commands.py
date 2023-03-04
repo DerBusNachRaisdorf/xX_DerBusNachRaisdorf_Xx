@@ -127,7 +127,7 @@ async def call_if_command(context: Context) -> bool:
     if command not in commands:
         return False
     # execute method
-    if command_mapping[command].admins_only:
+    if command_mapping[command].admins_only and not member_is_admin(context.message.author):
         await context.message.reply('Finger weg!')
     else:
         try:
