@@ -30,3 +30,9 @@ expected
 Behaviour
 actual
 speaken
+jzt
+vlt
+ok
+ne
+nh
+

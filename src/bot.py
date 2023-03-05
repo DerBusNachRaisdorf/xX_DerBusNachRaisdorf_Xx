@@ -16,7 +16,7 @@ from utility.proc import run_proc
 
 from utility.bifo import StrBIFO, StrBIFOSide
 
-DEUTSCHLEHRER_PROBABILITY: float = 1.0 #0.2
+DEUTSCHLEHRER_PROBABILITY: float = 0.2
 BLAH_BLAH_PROBABILITY: float = 0.1
 XD_PROBABILITY: float = 0.1
 

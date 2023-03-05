@@ -26,3 +26,5 @@ Herzen
 Freiwillige
 Freiwilliger
 Freiwilligen
+Stunde
+Stunden
