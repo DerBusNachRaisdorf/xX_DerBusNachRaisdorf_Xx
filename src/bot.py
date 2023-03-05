@@ -14,6 +14,10 @@ from settings import *
 from utility.parsing import tokenize_argv
 from utility.proc import run_proc
 
+DEUTSCHLEHRER_PROBABILITY: float = 0.2
+BLAH_BLAH_PROBABILITY: float = 0.1
+XD_PROBABILITY: float = 0.1
+
 SETTINGS_FILE: str = '/home/shared/botsettings.json'
 BACKGROUND_TIMER_INTERVAL_SEC: int = 10
 BROADCAST_TIMER_INTERVAL_SEC: int = 15 * 60
@@ -88,6 +92,10 @@ TOS: list[str] = [
     "Bestimmungen einhalten muss. Bei Verstoß gegen diese Bestimmungen behalten wir uns das Recht vor, den Zugang zum "
     "Bot zu sperren. "
 ]
+            
+
+def probability_check(probability: float):
+    return random.uniform(0, 1) <= probability
 
 
 def make_muha_safe(s: str) -> str:
@@ -220,7 +228,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             else:
                 await message.reply(
                     f'{user_get_name_from_id(REVILUM_ID)} und {len(self.settings.pizza) - 1} andere wollen Pizza essen.')
-        elif 'xD' in message.content or 'XD' in message.content:
+        elif 'xD' in message.content or 'XD' in message.content and probability_check(XD_PROBABILITY):
             await message.channel.send('xD' + ''.join(
                 ['D' if random.randint(0, 1000) > 5 else ' rofl lulululul lul xD' for i in
                  range(random.randint(0, 50))]))
@@ -492,7 +500,7 @@ class DerBusNachRaisdorfClient(discord.Client):
                     except Exception as e:
                         await message.channel.send(f'`{attachement.filename}`: error sending converted file: `{e}`')
                         continue
-        elif 'https://' not in muha_safe_message.lower() and '```' not in muha_safe_message.lower() and random.randint(0, 10) > 5:
+        elif 'https://' not in muha_safe_message.lower() and '```' not in muha_safe_message.lower() and probability_check(DEUTSCHLEHRER_PROBABILITY):
             exitcode, out, err = run_proc(['./derdeutschlehrer', muha_safe_message])
             if exitcode:
                 print('Nein')
@@ -510,7 +518,7 @@ class DerBusNachRaisdorfClient(discord.Client):
                         else:
                             self.settings.fehlerqouten[userid] = [errors, words]
                         self.save_settings()
-            elif random.randint(0, 100) > 90:
+            elif probability_check(BLAH_BLAH_PROBABILITY):
                 await message.reply('blah blah')
 
     async def on_member_update(self, before, after: discord.Member):
