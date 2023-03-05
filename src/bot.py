@@ -500,8 +500,8 @@ class DerBusNachRaisdorfClient(discord.Client):
                     except Exception as e:
                         await message.channel.send(f'`{attachement.filename}`: error sending converted file: `{e}`')
                         continue
-        elif 'https://' not in muha_safe_message.lower() and '```' not in muha_safe_message.lower() and probability_check(DEUTSCHLEHRER_PROBABILITY):
-            exitcode, out, err = run_proc(['./derdeutschlehrer', muha_safe_message])
+        elif 'https://' not in message.content and '```' not in message.content and probability_check(DEUTSCHLEHRER_PROBABILITY):
+            exitcode, out, err = run_proc(['./derdeutschlehrer', message.content])
             if exitcode:
                 print('Nein')
             if out != "":
