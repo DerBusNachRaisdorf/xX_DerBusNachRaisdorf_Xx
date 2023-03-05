@@ -13,7 +13,6 @@
  *  - unterstützt jzt Umlaute, dafür aber deutlich langsamer lul
  */
 
-
 #include <limits.h>
 #include <string>
 #include <vector>
@@ -26,8 +25,13 @@
 #include <string.h>
 #include <locale>
 #include <codecvt>
+
+/* UNIX stuff */
 #include <unistd.h>
 #include <dlfcn.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 #ifndef     OPTIMIZATION_LEVEL
     #define OPTIMIZATION_LEVEL 1
@@ -640,6 +644,7 @@ void DerDeutschlehrer::load_commonerrorlist(std::string filename)
         }
     }
 }
+
 
 int main(int argc, char **argv)
 {

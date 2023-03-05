@@ -14,7 +14,9 @@ from settings import *
 from utility.parsing import tokenize_argv
 from utility.proc import run_proc
 
-DEUTSCHLEHRER_PROBABILITY: float = 0.2
+from utility.bifo import StrBIFO
+
+DEUTSCHLEHRER_PROBABILITY: float = 1.0 #0.2
 BLAH_BLAH_PROBABILITY: float = 0.1
 XD_PROBABILITY: float = 0.1
 
@@ -143,6 +145,8 @@ class DerBusNachRaisdorfClient(discord.Client):
     ]
 
     async def load_settings(self):
+        self.deutschlehrer_bifo: StrBIFO = StrBIFO('deutschlehrer')
+
         self.settings = Settings()
         try:
             with open(SETTINGS_FILE, 'r') as f:
@@ -339,6 +343,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             else:
                 response = 'restarting...'
                 await message.reply(response)
+                self.deutschlehrer_bifo.close()
                 exit(0)
         elif message.content.split(' ')[0] == CMD_WHOAMI:
             await message.reply(f'{user_get_name(message.author)}')
@@ -501,10 +506,15 @@ class DerBusNachRaisdorfClient(discord.Client):
                         await message.channel.send(f'`{attachement.filename}`: error sending converted file: `{e}`')
                         continue
         elif 'https://' not in message.content and '```' not in message.content and probability_check(DEUTSCHLEHRER_PROBABILITY):
-            exitcode, out, err = run_proc(['./derdeutschlehrer', message.content])
-            if exitcode:
-                print('Nein')
-            if out != "":
+            #exitcode, out, err = run_proc(['./derdeutschlehrer', message.content])
+            #if exitcode:
+            #    print('Nein')
+
+            self.deutschlehrer_bifo.write(message.content)
+            out = self.deutschlehrer_bifo.read()
+            err = self.deutschlehrer_bifo.read()
+
+            if out != "" and out != message.content:
                 await message.reply(out);
                 if err != "":
                     numbers = list(map(int, err.split('/')))
@@ -543,7 +553,7 @@ class DerBusNachRaisdorfClient(discord.Client):
 
 
 if __name__ == '__main__':
-    run_proc(['g++', '-O3', '-o', 'derdeutschlehrer', 'derdeutschlehrer.cpp', '-D', 'USE_ADVANCED_EDIT_DISTANCE=0'])
+    #run_proc(['g++', '-O3', '-o', 'derdeutschlehrer', 'derdeutschlehrer.cpp', '-D', 'USE_ADVANCED_EDIT_DISTANCE=0'])
 
     try:
         with open('./info.md', 'r') as file:
