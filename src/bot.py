@@ -14,7 +14,7 @@ from settings import *
 from utility.parsing import tokenize_argv
 from utility.proc import run_proc
 
-from utility.bifo import StrBIFO
+from utility.bifo import StrBIFO, StrBIFOSide
 
 DEUTSCHLEHRER_PROBABILITY: float = 1.0 #0.2
 BLAH_BLAH_PROBABILITY: float = 0.1
@@ -145,7 +145,7 @@ class DerBusNachRaisdorfClient(discord.Client):
     ]
 
     async def load_settings(self):
-        self.deutschlehrer_bifo: StrBIFO = StrBIFO('deutschlehrer')
+        self.deutschlehrer_bifo: StrBIFO = StrBIFO(StrBIFOSide.CLIENT, 'deutschlehrer')
 
         self.settings = Settings()
         try:
