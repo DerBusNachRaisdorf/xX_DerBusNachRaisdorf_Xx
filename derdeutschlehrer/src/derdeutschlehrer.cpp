@@ -32,6 +32,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <semaphore.h>
 
 #include <mlvn/str_bifo.hpp>
 
@@ -445,7 +446,7 @@ private:
 DerDeutschlehrer::DerDeutschlehrer()
 {
     load_wordlist("wordlists/wordlist-german.txt");
-    load_wordlist("wordlists/wordlist-german-expaneded.txt");
+    load_wordlist("wordlists/wordlist-german-expanded.txt");
     load_wordlist("wordlists/wordlist-german-umgangsprache.txt");
     load_wordlist("wordlists/wordlist-german-anglizismen.txt");
     load_wordlist("wordlists/wordlist-german-insults.txt");
@@ -689,12 +690,43 @@ void fifo_loop(std::string fifo_name, DerDeutschlehrer &d)
             } else {
                 bifo.write("Word does already exist.");
             }
+        } else if (command == "exit") {
+            return;
         }
     }
 }
 
+#define SEM_NAME "/derderdeutschlehrer_sem"
+#define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
+#define INITIAL_VALUE 1
+
+bool file_exists (const char *filename) {
+    struct stat   buffer;   
+    return (stat (filename, &buffer) == 0);
+}
+
 int main(int argc, char **argv)
 {
+    return 0;
+
+
+
+
+    sem_t *semaphore;
+        semaphore = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE);
+
+    if (semaphore == SEM_FAILED) {
+        perror("sem_open(3) error");
+        semaphore = sem_open(SEM_NAME, O_RDWR);
+    }
+    if (semaphore == SEM_FAILED) {
+        perror("sem_open(3) error");
+        exit(EXIT_FAILURE);
+    }
+
+    sem_wait(semaphore);
+
+
     DerDeutschlehrer d;
 
     if (argc == 2) {
@@ -715,29 +747,37 @@ int main(int argc, char **argv)
             std::cout << "elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << "\n";
             return 0;
         } else if (strcmp(argv[1], "fifo") == 0) {
-            fifo_loop(argv[2], d);
-        }
-        return 1;
-    }
+            try {
+                fifo_loop(argv[2], d);
+            } catch (...) {
 
-    std::cout << "Isch kenne momentan " << d.known_words() << " Wörtahs." << std::endl;
+            }
+        }
+    } else {
+
+        std::cout << "Isch kenne momentan " << d.known_words() << " Wörtahs." << std::endl;
 
 #if ENABLE_RANDOM_CITES
-    std::cout << "Isch kenne momentan " << d.known_citations() << " Zitate." << std::endl;
+        std::cout << "Isch kenne momentan " << d.known_citations() << " Zitate." << std::endl;
 #endif
 
-    for (;;) {
-        std::string input;
-        std::cout << "> ";
-        std::getline(std::cin, input);
+        for (;;) {
+            std::string input;
+            std::cout << "> ";
+            std::getline(std::cin, input);
 
-        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-        CorrectionResult result = d.correct_message(input);
-        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+            CorrectionResult result = d.correct_message(input);
+            std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-        std::cout << "\n" << result.response << "\n";
-        std::cerr << result.errors << "/" << result.words << "\n";
+            std::cout << "\n" << result.response << "\n";
+            std::cerr << result.errors << "/" << result.words << "\n";
 
-        std::cout << "elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << "\n";
+            std::cout << "elapsed time: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count() << "ms" << "\n";
+        }
     }
+
+    sem_post(semaphore);
+    sem_close(semaphore);
+
 }

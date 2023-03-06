@@ -64,3 +64,4 @@ if __name__ == '__main__':
     bifo.write("Testungswortgebilde")
     print(bifo.read())
     #print(bifo.read())
+    bifo.write("exit")

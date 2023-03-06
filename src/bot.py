@@ -153,7 +153,10 @@ class DerBusNachRaisdorfClient(discord.Client):
                 self.settings.from_dict(json.loads(f.read()))
         except Exception as e:
             print('Can not load settings file.', file=stderr)
-            await self.get_channel(self.settings.admin_channel_id).send(f'Can not load settings: {e}!')
+            try:
+                await self.get_channel(self.settings.admin_channel_id).send(f'Can not load settings: {e}!')
+            except:
+                pass
 
     async def save_settings(self):
         try:
@@ -556,6 +559,8 @@ class DerBusNachRaisdorfClient(discord.Client):
 
 if __name__ == '__main__':
     #run_proc(['g++', '-O3', '-o', 'derdeutschlehrer', 'derdeutschlehrer.cpp', '-D', 'USE_ADVANCED_EDIT_DISTANCE=0'])
+    while True:
+        pass
 
     try:
         with open('./info.md', 'r') as file:
