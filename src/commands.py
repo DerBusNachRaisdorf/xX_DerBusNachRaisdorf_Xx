@@ -100,6 +100,15 @@ async def __cmd_reset_rechtschreibfehler(ctx: Context):
     await ctx.message.reply('done.')
 
 
+async def __cmd_add_word(ctx: Context):
+    if len(ctx.argv) != 2:
+        await ctx.message.reply('Ich will bitte genau ein Argument haben.')
+        return
+    ctx.deutschlehrer.write('add_word')
+    ctx.deutschlehrer.write(ctx.argv[1])
+    result: str = ctx.deutschlehrer.read()
+    await ctx.message.reply(result)
+
 
 #command_mapping: dict[str: callable(Context)] = {
 command_mapping: dict[str: RaisdorfCommand] = {
@@ -113,6 +122,7 @@ command_mapping: dict[str: RaisdorfCommand] = {
     # DerDeutschlehrer
     "rechtschreibfehler" : RaisdorfCommand(__cmd_rechtschreibfehler, False),
     "reset_rechtschreibfehler" : RaisdorfCommand(__cmd_reset_rechtschreibfehler, True),
+    "add_word" : RaisdorfCommand(__cmd_add_word, True),
     # utility commands
     "get_raisdorfuser_by_name" : RaisdorfCommand(__cmd_get_raisdorfuser_by_name, False)
 }
@@ -128,7 +138,7 @@ async def call_if_command(context: Context) -> bool:
         return False
     # execute method
     if command_mapping[command].admins_only and not member_is_admin(context.message.author):
-        await context.message.reply('Finger weg!')
+        await context.message.reply(f'Finger weg, {get_raisdorfuser(context.message.author).name}!')
     else:
         try:
             await command_mapping[command].callable(context)

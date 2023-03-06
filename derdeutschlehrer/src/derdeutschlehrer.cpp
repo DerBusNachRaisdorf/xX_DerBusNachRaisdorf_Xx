@@ -326,6 +326,9 @@ std::vector<WordInfo> str_words(const std::string &str)
             case '-': case '_': case '!': case '?':
             case ' ': case '\t': case '\'':
                 if (cur_type == WordType::WORD) {
+                    if (res.size() != 0 && res.back().type == WordType::NOISE && res.back().value.back() != L' ' && res.back().value.back() != '\t' && res.back().value.back() != '\n') {
+                        capitalize = false;
+                    }
                     res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence, capitalize);
                     cur_word = L"";
                     cur_type = WordType::NONE;
@@ -357,6 +360,9 @@ std::vector<WordInfo> str_words(const std::string &str)
         cur_word += c;
     }
     if (cur_word != L"") {
+                    if (res.size() != 0 && res.back().type == WordType::NOISE && res.back().value.back() != L' ' && res.back().value.back() != '\t' && res.back().value.back() != '\n') {
+                        capitalize = false;
+                    }
         res.emplace_back(cur_type, cur_word, cur_is_beginning_of_sentence, capitalize);
     }
 
@@ -420,9 +426,9 @@ public:
     inline size_t known_citations() const { return m_cite_map.size(); }
 #endif
 
-private:
-    void add_word(std::string &word, bool only_add_if_lowercase_does_not_already_exit=false);
+    bool add_word(std::string &word, bool only_add_if_lowercase_does_not_already_exit=false);
 
+private:
     void load_wordlist(std::string filename);
     void load_text(std::string filename, std::string author);
     void load_commonerrorlist(std::string filename);
@@ -556,22 +562,23 @@ CorrectionResult DerDeutschlehrer::correct_message(const std::string &message)
 
 }
 
-void DerDeutschlehrer::add_word(std::string &word, bool only_add_if_lowercase_does_not_already_exist)
+bool DerDeutschlehrer::add_word(std::string &word, bool only_add_if_lowercase_does_not_already_exist)
 {
     std::string word_lower = str_tolower(word);
 
     auto it = m_wordmap.find(word);
     if (it != m_wordmap.end() && it->second == word) {
-        return;
+        return false;
     }
     it = m_wordmap.find(word_lower);
     if (it != m_wordmap.end() && (it->second == word || only_add_if_lowercase_does_not_already_exist)) {
-        return;
+        return false;
     }
 
     m_words.push_back(word);
     m_wordmap.insert(std::make_pair(word, word));
     m_wordmap.insert(std::make_pair(word_lower, word));
+    return true;
 }
 
 void DerDeutschlehrer::load_wordlist(std::string filename)
@@ -647,15 +654,42 @@ void DerDeutschlehrer::load_commonerrorlist(std::string filename)
     }
 }
 
+int append_wordlist(std::string filename, std::string word)
+{
+    std::ofstream writer(filename, std::ios::app);
+
+    if (!writer)
+    {
+        std::cout << "There was an error opening file for output" << std::endl;
+        return -1;
+    }
+
+    writer << word << std::endl;
+    writer.close();
+    return 0;
+}
+
 void fifo_loop(std::string fifo_name, DerDeutschlehrer &d)
 {
     std::cout << "FIFO-Server running: '" << fifo_name << "'\n";
     mlvn::StrBIFO bifo(mlvn::StrBIFOSide::SERVER, fifo_name);
     for (;;) {
-        std::string msg = bifo.read();
-        CorrectionResult result = d.correct_message(msg);
-        bifo.write(result.response);
-        bifo.write(std::to_string(result.errors) + "/" + std::to_string(result.words));
+        std::string command = bifo.read();
+        if (command == "correct") {
+            std::string msg = bifo.read();
+            CorrectionResult result = d.correct_message(msg);
+            bifo.write(result.response);
+            bifo.write(std::to_string(result.errors) + "/" + std::to_string(result.words));
+        } else if (command == "add_word") {
+            std::string word = bifo.read();
+            bool res = d.add_word(word);
+            if (res) {
+                int succ = append_wordlist("wordlists/wordlist-german-expanded.txt", word);
+                bifo.write(succ ? "Added '" + word + "'. Error writing file." : "Added '" + word + "'.");
+            } else {
+                bifo.write("Word does already exist.");
+            }
+        }
     }
 }
 

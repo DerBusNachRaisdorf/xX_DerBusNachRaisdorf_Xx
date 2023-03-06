@@ -60,6 +60,7 @@ class StrBIFO:
 
 if __name__ == '__main__':
     bifo = StrBIFO(StrBIFOSide.CLIENT, 'deutschlehrer')
-    bifo.write("Häääääääää ich verstehe es nicht.")
+    bifo.write("add_word")
+    bifo.write("Testungswortgebilde")
     print(bifo.read())
-    print(bifo.read())
+    #print(bifo.read())

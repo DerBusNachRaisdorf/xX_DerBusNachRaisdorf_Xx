@@ -200,7 +200,8 @@ class DerBusNachRaisdorfClient(discord.Client):
         # create context
         context = Context(message=message,
                           client=self,
-                          settings=self.settings)
+                          settings=self.settings,
+                          deutschlehrer=self.deutschlehrer_bifo)
 
         if muha_safe_message != message.content and muha_safe_message[0] == '!':
             message.content = muha_safe_message
@@ -510,6 +511,7 @@ class DerBusNachRaisdorfClient(discord.Client):
             #if exitcode:
             #    print('Nein')
 
+            self.deutschlehrer_bifo.write('correct')
             self.deutschlehrer_bifo.write(message.content)
             out = self.deutschlehrer_bifo.read()
             err = self.deutschlehrer_bifo.read()
