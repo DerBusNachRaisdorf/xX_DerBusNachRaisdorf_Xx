@@ -707,11 +707,6 @@ bool file_exists (const char *filename) {
 
 int main(int argc, char **argv)
 {
-    return 0;
-
-
-
-
     sem_t *semaphore;
         semaphore = sem_open(SEM_NAME, O_CREAT | O_EXCL, SEM_PERMS, INITIAL_VALUE);
 

@@ -559,9 +559,6 @@ class DerBusNachRaisdorfClient(discord.Client):
 
 if __name__ == '__main__':
     #run_proc(['g++', '-O3', '-o', 'derdeutschlehrer', 'derdeutschlehrer.cpp', '-D', 'USE_ADVANCED_EDIT_DISTANCE=0'])
-    while True:
-        pass
-
     try:
         with open('./info.md', 'r') as file:
             INFO_STR = file.read()
