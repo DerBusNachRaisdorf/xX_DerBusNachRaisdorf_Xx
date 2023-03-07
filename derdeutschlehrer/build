@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# connor-certified makefile
+
+mkdir -p bin
 mkdir -p obj/mlvn
 gcc -c -o obj/mlvn/bifo_c.o src/mlvn/bifo.c -Iinclude -O3
 g++ -c -o obj/mlvn/str_bifo_cpp.o src/mlvn/str_bifo.cpp -Iinclude -O3
