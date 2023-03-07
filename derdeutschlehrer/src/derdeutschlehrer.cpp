@@ -696,7 +696,7 @@ void fifo_loop(std::string fifo_name, DerDeutschlehrer &d)
     }
 }
 
-#define SEM_NAME "/derderdeutschlehrer_sem"
+#define SEM_NAME "/deutschlehrer_sem"
 #define SEM_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
 #define INITIAL_VALUE 1
 
@@ -713,13 +713,18 @@ int main(int argc, char **argv)
     if (semaphore == SEM_FAILED) {
         perror("sem_open(3) error");
         semaphore = sem_open(SEM_NAME, O_RDWR);
-    }
-    if (semaphore == SEM_FAILED) {
-        perror("sem_open(3) error");
-        exit(EXIT_FAILURE);
+        if (semaphore == SEM_FAILED) {
+            perror("sem_open(3) error");
+            exit(EXIT_FAILURE);
+        }
     }
 
-    sem_wait(semaphore);
+    if (sem_trywait(semaphore) != 0) {
+        int val;
+        sem_getvalue(semaphore, &val);
+        std::cout << "Es läuft bereits eine andere Instanz. " << val << "\n";
+        exit(EXIT_FAILURE);
+    }
 
 
     DerDeutschlehrer d;
