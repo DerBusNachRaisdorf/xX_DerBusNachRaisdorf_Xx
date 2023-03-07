@@ -4,7 +4,7 @@
 
 mkdir -p bin
 mkdir -p obj/mlvn
-gcc -c -o obj/mlvn/bifo_c.o src/mlvn/bifo.c -Iinclude -O3
-g++ -c -o obj/mlvn/str_bifo_cpp.o src/mlvn/str_bifo.cpp -Iinclude -O3
-g++ -c -o obj/derdeutschlehrer_cpp.o src/derdeutschlehrer.cpp -Iinclude -O3
-g++ -o bin/derdeutschlehrer obj/mlvn/bifo_c.o obj/mlvn/str_bifo_cpp.o obj/derdeutschlehrer_cpp.o
+gcc -c -o obj/mlvn/bifo_c.o src/mlvn/bifo.c -Iinclude -O3 -pthread
+g++ -c -o obj/mlvn/str_bifo_cpp.o src/mlvn/str_bifo.cpp -Iinclude -O3 -pthread
+g++ -c -o obj/derdeutschlehrer_cpp.o src/derdeutschlehrer.cpp -Iinclude -O3 -pthread
+g++ -o bin/derdeutschlehrer obj/mlvn/bifo_c.o obj/mlvn/str_bifo_cpp.o obj/derdeutschlehrer_cpp.o -pthread
