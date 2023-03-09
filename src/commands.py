@@ -110,6 +110,15 @@ async def __cmd_add_word(ctx: Context):
     await ctx.message.reply(result)
 
 
+async def __cmd_raisdorfgpt_system(ctx: Context):
+    if len(ctx.argv) < 2:
+        await ctx.message.reply('Nein bitte mehr Argumente!!!!')
+        return
+    message: str = ' '.join(ctx.argv[1:])
+    ctx.raisdorf_gpt.chatgpt.add_system_message(message)
+    await ctx.message.reply('JAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+
+
 #command_mapping: dict[str: callable(Context)] = {
 command_mapping: dict[str: RaisdorfCommand] = {
     # bann commands
@@ -123,6 +132,8 @@ command_mapping: dict[str: RaisdorfCommand] = {
     "rechtschreibfehler" : RaisdorfCommand(__cmd_rechtschreibfehler, False),
     "reset_rechtschreibfehler" : RaisdorfCommand(__cmd_reset_rechtschreibfehler, True),
     "add_word" : RaisdorfCommand(__cmd_add_word, True),
+    # RaisdorfGPT
+    "raisdorfgpt_system": RaisdorfCommand(__cmd_raisdorfgpt_system, True),
     # utility commands
     "get_raisdorfuser_by_name" : RaisdorfCommand(__cmd_get_raisdorfuser_by_name, False)
 }

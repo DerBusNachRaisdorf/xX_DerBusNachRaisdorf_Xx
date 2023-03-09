@@ -16,6 +16,8 @@ from utility.proc import run_proc
 
 from utility.bifo import StrBIFO, StrBIFOSide
 
+import raisdorf_gpt
+
 DEUTSCHLEHRER_PROBABILITY: float = 0.2
 BLAH_BLAH_PROBABILITY: float = 0.1
 XD_PROBABILITY: float = 0.1
@@ -145,7 +147,6 @@ class DerBusNachRaisdorfClient(discord.Client):
     ]
 
     async def load_settings(self):
-        self.deutschlehrer_bifo: StrBIFO = StrBIFO(StrBIFOSide.CLIENT, 'deutschlehrer')
 
         self.settings = Settings()
         try:
@@ -168,6 +169,8 @@ class DerBusNachRaisdorfClient(discord.Client):
             await self.get_channel(self.settings.admin_channel_id).send(f'Can not save settings: {e}!')
 
     async def on_ready(self):
+        self.deutschlehrer_bifo: StrBIFO = StrBIFO(StrBIFOSide.CLIENT, 'deutschlehrer')
+        self.raisdorf_gpt = raisdorf_gpt.RaisdorfGPT()
         await self.load_settings()
         self.loop.create_task(self.background_timer())
         self.loop.create_task(self.broadcast_timer())
@@ -204,7 +207,8 @@ class DerBusNachRaisdorfClient(discord.Client):
         context = Context(message=message,
                           client=self,
                           settings=self.settings,
-                          deutschlehrer=self.deutschlehrer_bifo)
+                          deutschlehrer=self.deutschlehrer_bifo,
+                          raisgpt=self.raisdorf_gpt)
 
         if muha_safe_message != message.content and muha_safe_message[0] == '!':
             message.content = muha_safe_message
@@ -222,8 +226,18 @@ class DerBusNachRaisdorfClient(discord.Client):
 
         # better command handling
         if await commands.call_if_command(context):
-            self.save_settings() # falls der comand was verändert hat lul, in Zukunft soll der command selber speicher, kann er gerade aber noch nicht :/ sad
+            await self.save_settings() # falls der comand was verändert hat lul, in Zukunft soll der command selber speicher, kann er gerade aber noch nicht :/ sad
             return
+        else:
+            try:
+                # TODO: pass is_mentioned=True if bot was mentioned, so it will 100% respond
+                response: str = self.raisdorf_gpt.on_message(muha_safe_message, get_raisdorfuser(message.author), message.channel.id)
+                if response:
+                    await message.reply(response)
+                    return
+            except Exception as e:
+                # TODO
+                print(e)
 
         if '?nils pizza' in message.content.lower():
             if REVILUM_ID not in self.settings.pizza:
