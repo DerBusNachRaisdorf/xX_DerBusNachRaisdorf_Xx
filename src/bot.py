@@ -228,7 +228,7 @@ class DerBusNachRaisdorfClient(discord.Client):
         if await commands.call_if_command(context):
             await self.save_settings() # falls der comand was verändert hat lul, in Zukunft soll der command selber speicher, kann er gerade aber noch nicht :/ sad
             return
-        else:
+        elif muha_safe_message[0] != '!':
             try:
                 # TODO: pass is_mentioned=True if bot was mentioned, so it will 100% respond
                 response: str = self.raisdorf_gpt.on_message(muha_safe_message, get_raisdorfuser(message.author), message.channel.id)
