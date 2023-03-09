@@ -2,7 +2,15 @@ import utility.chatgpt as chatgpt
 import random
 from settings import RaisdorfUser
 
-RAISDORFGPT_CHANNEL_IDS = {985221327722016841}
+RAISDORFGPT_CHANNEL_IDS = {
+    985221327722016841, # MelvinsBaustelle - general
+    982391359103180873, # CAU-Elite - general
+    1065604359100047472, # CAU-Elite - memes
+    1039643607747018872, # CAU-Elite - OS
+    1041461676479881318, # CAU-Elite - DeklProg
+    1052004758451392662, # CAU-Elite - Weitere Kunst
+    1067487318337925170  # CAU-Elite - Chat-GPT Witze
+}
 RAISDORFGPT_PROBABILITY: float = 0.3
 
 RAISDORFGPT_PROMPT: str = 'Du bist DerBusNachRaisdorf, eine KI, die auf dem Discord-Server CAU-Elite lebt und immer sehr geschwollen spricht.'
