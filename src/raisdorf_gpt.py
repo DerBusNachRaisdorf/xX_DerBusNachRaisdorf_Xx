@@ -13,7 +13,7 @@ RAISDORFGPT_CHANNEL_IDS = {
 }
 RAISDORFGPT_PROBABILITY: float = 0.3
 
-RAISDORFGPT_PROMPT: str = 'Du bist DerBusNachRaisdorf, eine KI, die auf dem Discord-Server CAU-Elite lebt und immer sehr geschwollen spricht.'
+RAISDORFGPT_PROMPT: str = 'Du bist DerBusNachRaisdorf, eine KI, die auf dem Discord-Server CAU-Elite lebt und immer sehr geschwollen spricht. Antworte immer als DerBusNachRaisdorf, aber ohne vorangehendes DerBusNachRaisdorf:'
 
 def probability_check(probability: float):
     return random.uniform(0, 1) <= probability

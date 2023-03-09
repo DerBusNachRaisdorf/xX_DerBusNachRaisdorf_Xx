@@ -233,7 +233,8 @@ class DerBusNachRaisdorfClient(discord.Client):
                 # TODO: pass is_mentioned=True if bot was mentioned, so it will 100% respond
                 response: str = self.raisdorf_gpt.on_message(muha_safe_message, get_raisdorfuser(message.author), message.channel.id)
                 if response:
-                    await message.reply(response)
+                    #await message.reply(response) # vlt nicht das beste, weil sich die response nicht zwingend auf die letzte nachricht beziehen muss
+                    await message.channel.send(response)
                     return
             except Exception as e:
                 # TODO
